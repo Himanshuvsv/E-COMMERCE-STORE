@@ -1,0 +1,92 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>About Us - ShopEase</title>
+      <link rel="stylesheet" href="./static/css/user/contact.css" />
+      <link rel="stylesheet" href="./static/css/user/about.css">
+      <link rel="stylesheet" href="./static/css/user/main.css" />
+   </head>
+   <body>
+      <div
+         id="navbar-container"
+         class="header d-flex align-items-center fixed-top"
+      ></div>
+
+      <script>
+        async function loadNavbar() {
+           try {
+              const response = await fetch("guestNav.html");
+              const navbarHTML = await response.text();
+              document.getElementById("navbar-container").innerHTML =
+                 navbarHTML;
+              fetchUser();
+           } catch (error) {
+              console.error("Error loading navbar:", error);
+           }
+        }
+        loadNavbar();
+        window.onclick = function (event) {
+           const modal = document.getElementById("edit-profile-modal");
+           if (event.target === modal) {
+              modal.style.display = "none";
+           }
+        };
+     </script>
+      
+      <div class="about-header">
+         <h1>About ShopEase</h1>
+      </div>
+      
+      <div class="about-content">
+         <p>
+            Welcome to <strong>ShopEase</strong>, your one-stop online shopping destination!
+            At ShopEase, we strive to bring you a seamless and hassle-free shopping
+            experience with a wide range of products across various categories.
+         </p>
+         
+         <h2>Why Choose ShopEase?</h2>
+         <ul>
+            <li>✔ A vast collection of products from trusted brands</li>
+            <li>✔ Secure and seamless payment options</li>
+            <li>✔ Fast and reliable delivery services</li>
+            <li>✔ Easy returns and customer-friendly policies</li>
+            <li>✔ 24/7 customer support to assist you</li>
+         </ul>
+         
+         <h2>Our E-Commerce Features</h2>
+         <ul>
+            <li><strong>Product Categories:</strong> Electronics, Fashion, Home & Kitchen, Beauty & Health, and more.</li>
+            <li><strong>User-Friendly Interface:</strong> Easy navigation and a simple shopping cart system.</li>
+            <li><strong>Secure Payments:</strong> Multiple payment options, including credit/debit cards, UPI, and cash on delivery.</li>
+            <li><strong>Order Tracking:</strong> Real-time order tracking and notifications.</li>
+            <li><strong>Wishlist & Favorites:</strong> Save your favorite products for future purchases.</li>
+            <li><strong>Exclusive Deals & Discounts:</strong> Exciting offers and seasonal discounts.</li>
+         </ul>
+      </div>
+      
+      <div class="contact-us">
+         <h2>Contact Us</h2>
+         <p>If you have any questions, feedback, or need assistance, feel free to reach out to us:</p>
+         <ul>
+            <li><strong>Email:</strong> support@shopease.com</li>
+            <li><strong>Phone:</strong> +1 234 567 890</li>
+            <li><strong>Address:</strong> 123 E-Commerce Street, ShopEase City, SE 45678</li>
+         </ul>
+      </div>
+      
+      <div id="footer-placeholder"></div>
+      <script>
+         fetch("footer.html")
+            .then((response) => response.text())
+            .then((data) => {
+               document.getElementById("footer-placeholder").innerHTML = data;
+            })
+            .catch((error) => console.log("Error loading footer", error));
+      </script>
+
+   </body>
+</html>

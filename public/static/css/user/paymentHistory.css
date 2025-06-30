@@ -1,0 +1,73 @@
+body {
+   font-family: Arial, sans-serif;
+   background-color: #f8f9fa;
+   margin: 0;
+   padding: 0;
+}
+.container {
+   width: 90%;
+   margin: auto;
+   padding: 20px;
+}
+h2 {
+   text-align: left;
+   font-size: 24px;
+}
+.filters {
+   display: flex;
+   gap: 10px;
+   margin-bottom: 20px;
+}
+.filters button {
+   padding: 8px 16px;
+   border: none;
+   background-color: #33425d;
+   color: white;
+   cursor: pointer;
+   border-radius: 5px;
+   font-size: 14px;
+}
+.filters button.active {
+   background-color: #e0e7ff;
+   color: #3b82f6;
+   font-weight: bold;
+}
+table {
+   width: 100%;
+   border-collapse: collapse;
+   background: white;
+   border-radius: 10px;
+   overflow: hidden;
+   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+th,
+td {
+   border-bottom: 1px solid #ddd;
+   padding: 12px;
+   text-align: left;
+}
+th {
+   background-color: #f4f4f4;
+   font-weight: bold;
+}
+.status {
+   padding: 5px 10px;
+   border-radius: 12px;
+   font-weight: bold;
+   display: inline-block;
+}
+.succeeded {
+   background-color: #d4edda;
+   color: #155724;
+}
+.refunded {
+   background-color: #f8d7da;
+   color: #721c24;
+}
+.failed {
+   background-color: #f5c6cb;
+   color: #721c24;
+}
+.my-4 {
+   margin-top: 8px;
+}

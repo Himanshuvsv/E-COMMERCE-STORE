@@ -1,0 +1,289 @@
+
+
+.order {
+    border: 2px solid #ddd;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+ }
+
+ .order:hover {
+    transform: scale(1.02);
+ }
+
+ .order.canceled {
+    border-color: #ff4d4d;
+    background-color: #fff0f0;
+    opacity: 0.8;
+    position: relative;
+ }
+ .order.canceled::after {
+    content: "CANCELED";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff4d4d;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+ }
+ .order.canceled .cancel-btn {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    pointer-events: none;
+ }
+
+ /* Buttons */
+ .cancel-btn {
+    background-color: #ff4d4d;
+    color: white;
+    margin-right: 5px;
+    margin-right: 5px;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out;
+ }
+
+ .cancel-btn:hover {
+    background-color: #cc0000;
+ }
+
+ .track-btn {
+    background-color: #008cff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out;
+ }
+
+ .track-btn:hover {
+    background-color: #005bb5;
+ }
+
+ /* Styles for the review popup */
+ .review-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    width: 300px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    text-align: center;
+ }
+
+ .review-popup h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+ }
+
+ .review-popup p {
+    font-size: 16px;
+    color: #f39c12;
+    margin-bottom: 10px;
+ }
+
+ .review-popup input,
+ .review-popup textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+ }
+
+ .review-popup textarea {
+    height: 80px;
+    resize: none;
+ }
+
+ .review-popup button {
+    width: 48%;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 5px;
+ }
+
+ #submit-review-btn {
+    background-color: #28a745;
+    color: white;
+ }
+
+ #cancel-review-btn {
+    background-color: #dc3545;
+    color: white;
+ }
+
+ #submit-review-btn:hover {
+    background-color: #218838;
+ }
+
+ #cancel-review-btn:hover {
+    background-color: #c82333;
+ }
+ .review-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+ }
+
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 24px;
+}
+
+.tabs {
+    display: flex;
+    gap: 15px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.tabs button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.tabs .active {
+    color: orange;
+    border-bottom: 3px solid orange;
+}
+
+.order-filter {
+    margin-top: 15px;
+}
+
+.search-orders {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.search-orders input {
+    width: 80%;
+    padding: 8px;
+}
+
+.search-orders button {
+    background: black;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.empty-message {
+    margin-top: 20px;
+    font-size: 16px;
+    color: gray;
+}
+
+.sponsored {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.product-info {
+    font-size: 14px;
+}
+
+.price {
+    color: red;
+    font-weight: bold;
+}
+
+.discount {
+    font-size: 16px;
+    color: red;
+}
+
+.prime {
+    color: blue;
+    font-weight: bold;
+}
+
+ .order {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+ }
+ .order h2 {
+    color: #007185;
+ }
+ .order p {
+    margin: 5px 0;
+ }
+ .order-items {
+    display: flex;
+    flex-wrap: wrap;
+ }
+ .order-item {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #ddd;
+    padding: 10px 0;
+    width: 100%;
+ }
+ .order-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    margin-right: 10px;
+ }
+ .order-item div {
+    flex: 1;
+ }
+ .payment-status {
+    font-weight: bold;
+    color: green;
+ }
+ .payment-status.pending {
+    color: orange;
+ }
+ .payment-status.failed {
+    color: red;
+ }

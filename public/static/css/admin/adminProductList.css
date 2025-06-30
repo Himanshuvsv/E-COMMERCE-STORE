@@ -1,0 +1,115 @@
+.container {
+   margin-top: 40px;
+   min-width: 1450px;
+   margin-left: 80px;
+   height: fit-content;
+   background: white;
+   padding: 20px;
+   border-radius: 8px;
+   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+   margin-left: 13%;
+}
+
+table {
+   width: 100%;
+   border-collapse: collapse;
+}
+
+table, th, td {
+   border: 1px solid #ddd;
+}
+
+th, td {
+   padding: 8px;
+   text-align: left;
+}
+
+th {
+   background-color: #007bff;
+   color: white;
+}
+
+.actions {
+   display: flex;
+   gap: 5px; 
+}
+
+.actions button {
+   padding: 6px 12px;
+   border: none;
+   border-radius: 5px;
+   cursor: pointer;
+   font-size: 14px;
+}
+
+.product {
+   width: 50px;
+   height: 50px;
+   object-fit: cover;
+}
+.actions button {
+   margin: 5px;
+   padding: 5px 10px;
+   cursor: pointer;
+}
+
+.btn {
+   padding: 5px;
+   padding: 5px 10px;
+   border: none;
+   border-radius: 3px;
+   cursor: pointer;
+}
+
+.btn-edit {
+   background-color: #28a745;
+   color: white;
+   margin-top: 10px;
+}
+.btn-delete {
+   background-color: #dc3545;
+   color: white;
+   margin-top: 10px;
+}
+
+.btn-edit:hover {
+   opacity: 0.8;
+   background-color: #0f7226;
+   color: white;
+}
+
+.btn-delete:hover {
+   opacity: 0.8;
+   background-color: #c12f3d;
+   color: white;
+}
+
+input[type="text"] {
+   flex: 1;
+   padding: 8px;
+   border-radius: 5px;
+   border: 1%;
+}
+
+.search-filter {
+   display: flex;
+   gap: 10px;
+   margin-bottom: 15px;
+   border-radius: 2%;
+}
+
+button {
+   background-color: green;
+   color: white;
+   padding: 10px 20px;
+   border: none;
+   border-radius: 25px;
+   font-size: 16px;
+   cursor: pointer;
+   transition: background-color 0.3s ease;
+}
+
+button:hover {
+   background-color: rgb(3, 0, 100);
+   color: #ddd;
+}

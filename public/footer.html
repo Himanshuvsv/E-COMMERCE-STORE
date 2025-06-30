@@ -1,0 +1,75 @@
+<link rel="stylesheet" href="./static/css/user/footer.css" />
+<link rel="stylesheet" href="./static/css/user/order.css" />
+<footer class="bg-gray-900 text-white py-8">
+   <div
+      class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center"
+   >
+      <!-- Logo Section -->
+      <div class="mb-6 md:mb-0">
+         <img src="./logo.jpeg" alt="ShopEase Logo" class="h-12" />
+      </div>
+
+      <!-- Contact Information -->
+      <div class="text-center md:text-left">
+         <p class="text-lg font-bold">Let's start</p>
+         <p class="mt-2">Your cup of tea ?</p>
+         <p class="mt-4">
+            <a href="mailto:hello@shopease.co" class="underline"
+               >hello@shopease.co</a
+            >
+         </p>
+         <p class="mt-2 font-bold">+91 9021342421</p>
+      </div>
+
+      <!-- Quote Button and Watch -->
+      <div class="mt-6 md:mt-0 flex flex-col items-center">
+         <div id="clock" class="text-3xl font-bold"></div>
+      </div>
+   </div>
+
+   <!-- Social Media Links -->
+   <div class="container mx-auto px-4 mt-8 flex justify-center space-x-6">
+      <a href="#" class="text-white hover:text-gray-400">Bė</a>
+      <a href="#" class="text-white hover:text-gray-400">🕶️</a>
+      <a href="#" class="text-white hover:text-gray-400">🔍</a>
+      <a href="#" class="text-white hover:text-gray-400">📷</a>
+      <a href="#" class="text-white hover:text-gray-400">🕊️</a>
+      <a href="#" class="text-white hover:text-gray-400">👤</a>
+      <a href="#" class="text-white hover:text-gray-400">🎥</a>
+   </div>
+
+   <!-- Footer Section  -->
+   <div class="container mx-auto px-4 mt-8 text-center text-gray-500">
+      <p>Developed by:: Himanshu Vasava</p>
+   </div>
+
+   <!-- Back to Top Button -->
+   <div class="fixed bottom-4 right-4">
+      <a
+         href="#top"
+         class="bg-gray-800 text-white p-2 rounded-full hover:bg-gray-700 transition"
+         >⬆️</a
+      >
+   </div>
+</footer>
+
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+      function updateClock() {
+         const clock = document.getElementById("clock");
+         if (!clock) {
+            console.error("Clock element not found!");
+            return;
+         }
+
+         const now = new Date();
+         const hours = String(now.getHours()).padStart(2, "0");
+         const minutes = String(now.getMinutes()).padStart(2, "0");
+         const seconds = String(now.getSeconds()).padStart(2, "0");
+         clock.textContent = `${hours}:${minutes}:${seconds}`;
+      }
+
+      setInterval(updateClock, 1000);
+      updateClock(); // Run immediately to show the time without waiting for 1 second
+   });
+</script>

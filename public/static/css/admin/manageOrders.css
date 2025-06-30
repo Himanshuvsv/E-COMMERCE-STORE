@@ -1,0 +1,145 @@
+
+.container {
+   margin-top: 40px;
+   min-width: 1450px;
+   margin-left: 80px;
+   height: fit-content;
+   background: white;
+   padding: 20px;
+   border-radius: 8px;
+   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+   margin-left: 13%;
+}
+h2 {
+   text-align: center;
+}
+.search-bar {
+   width: 90%;
+   padding: 10px;
+   margin-bottom: 20px;
+   border: 1px solid #ccc;
+   border-radius: 5px;
+}
+
+
+#searchOrderButton {
+   width: 5%;
+   padding: 10px;
+   border: none;
+   background-color: black;
+   color: white;
+   border-radius: 10px;
+   font-weight: bolder;
+}
+
+#searchOrderButton:hover{
+   color: black;
+   background-color: rgb(21, 190, 247);
+   font-weight: bolder;
+}
+
+
+table {
+   width: 100%;
+   border-collapse: collapse;
+}
+table,
+th,
+td {
+   border: 1px solid #ddd;
+}
+th,
+td {
+   padding: 8px;
+   text-align: left;
+}
+th {
+   background-color: #007bff;
+   color: white;
+}
+.btn {
+   padding: 5px;
+   padding: 5px 10px;
+   border: none;
+   border-radius: 3px;
+   cursor: pointer;
+}
+.btn-edit {
+   background-color: #28a745;
+   color: white;
+   margin-top: 10px;
+}
+.btn-delete {
+   background-color: #dc3545;
+   color: white;
+   margin-top: 10px;
+}
+
+#editOrderContainer {
+   display: none;
+   position: fixed;
+   top: 50%;
+   left: 50%;
+   background-color: beige;
+   transform: translate(-50%, -50%);
+   background: white;
+   padding: 20px;
+   border-radius: 10px;
+   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+   width: 300px;
+   z-index: 1000;
+}
+
+.edit-popup {
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+}
+
+.edit-popup h2 {
+   font-size: 20px;
+   text-align: center;
+}
+
+.edit-popup label {
+   font-weight: bold;
+}
+
+.edit-popup select {
+   padding: 5px;
+   border: 1px solid #ccc;
+   border-radius: 5px;
+}
+
+.edit-popup button {
+   padding: 8px 12px;
+   border: none;
+   border-radius: 5px;
+   cursor: pointer;
+}
+
+.edit-popup button:first-of-type {
+   background: #4caf50;
+   color: white;
+}
+
+.edit-popup button:last-of-type {
+   background: #f44336;
+   color: white;
+}
+
+.edit-popup button:hover {
+   opacity: 0.8;
+}
+
+/* Overlay to dim the background */
+#editOrderContainer::before {
+   content: "";
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(0, 0, 0, 0.5);
+   z-index: -1;
+}

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Profile Page</title>
+      <link rel="stylesheet" href="./static/css/user/profile.css" />
+      <link rel="stylesheet" href="./static/css/user/main.css" />
+      <link rel="stylesheet" href="./static/css/user/footer.css" />
+      <link href="https://fonts.googleapis.com" rel="preconnect" />
+      <link rel="stylesheet" href="./static/css/user/updateprofile.css" />
+      <style>
+         body {
+            background-image: url("./background.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat;
+         }
+      </style>
+   </head>
+   <body class="index-page">
+      <div
+         id="navbar-container"
+         class="header d-flex align-items-center fixed-top"
+      ></div>
+      <div class="profile-container">
+         <img src="./profile.jpg" alt="Profile Picture" class="profile-pic" />
+         <form id="profileForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" value="John Doe" disabled />
+            <label for="email">Email:</label>
+            <input
+               type="email"
+               id="email"
+               name="email"
+               value="johndoe@example.com"
+               disabled
+            />
+            <label for="password">Password:</label>
+            <input type="password" id="password" value="password123" disabled />
+            <button type="button" id="editBtn">Edit</button>
+         </form>
+      </div>
+      <!-- Update Options Modal -->
+      <div id="updateOptionsModal" class="modal">
+         <div class="modal-content">
+            <span class="close" id="closeOptionsModal">&times;</span>
+            <h2>Choose an option</h2>
+            <button id="updateProfileBtn">Update Profile</button>
+            <button id="updatePasswordBtn">Update Password</button>
+         </div>
+      </div>
+
+      <!-- Update Profile Modal -->
+      <div id="updateProfileModal" class="modal">
+         <div class="modal-content">
+            <span class="close" id="closeProfileModal">&times;</span>
+            <h2>Update Profile</h2>
+            <form id="updateProfileForm">
+               <label for="newName">Name:</label>
+               <input type="text" id="newName" name="name" />
+               <label for="newEmail">Email:</label>
+               <input type="email" id="newEmail" name="email" />
+               <button type="submit">Save</button>
+            </form>
+         </div>
+      </div>
+
+      <!-- Update Password Modal -->
+      <div id="updatePasswordModal" class="modal">
+         <div class="modal-content">
+            <span class="close" id="closePasswordModal">&times;</span>
+            <h2>Update Password</h2>
+            <form id="updatePasswordForm">
+               <label for="oldPassword">Old Password:</label>
+               <input
+                  type="password"
+                  id="oldPassword"
+                  name="oldPassword"
+                  required
+               />
+               <label for="newPassword">New Password:</label>
+               <input
+                  type="password"
+                  id="newPassword"
+                  name="newPassword"
+                  required
+               />
+               <button type="submit">Save</button>
+            </form>
+         </div>
+      </div>
+      <script>
+         async function loadNavbar() {
+            try {
+               const response = await fetch("navbar.html");
+               const navbarHTML = await response.text();
+               document.getElementById("navbar-container").innerHTML =
+                  navbarHTML;
+            } catch (error) {
+               console.error("Error loading navbar:", error);
+            }
+         }
+         loadNavbar();
+
+         fetch("footer.html")
+            .then((response) => response.text())
+            .then((data) => {
+               document.getElementById("footer-placeholder").innerHTML = data;
+            })
+            .catch((error) => console.log("error loading footer", error));
+      </script>
+
+      <script>
+         document.addEventListener("DOMContentLoaded", async () => {
+            try {
+               const response = await fetch(
+                  "http://127.0.0.1:5000/api/users/showMe",
+                  {
+                     method: "GET",
+                     credentials: "include",
+                     headers: {
+                        "Content-Type": "application/json",
+                     },
+                  }
+               );
+
+               const data = await response.json();
+               console.log("API Response:", data);
+
+               if (!response.ok) {
+                  throw new Error("Failed to fetch user details");
+               }
+
+               const user = data.user;
+               if (user) {
+                  document.getElementById("name").value = user.name || "";
+                  document.getElementById("email").value =
+                     user.email || "No email found";
+                  document.getElementById("password").value = "********";
+               }
+            } catch (error) {
+               console.error("Error fetching user details:", error);
+            }
+         });
+      </script>
+
+      <script>
+         document.addEventListener("DOMContentLoaded", () => {
+            // Get elements
+            const editBtn = document.getElementById("editBtn");
+            const updateOptionsModal =
+               document.getElementById("updateOptionsModal");
+            const updateProfileModal =
+               document.getElementById("updateProfileModal");
+            const updatePasswordModal = document.getElementById(
+               "updatePasswordModal"
+            );
+            const closeOptionsModal =
+               document.getElementById("closeOptionsModal");
+            const closeProfileModal =
+               document.getElementById("closeProfileModal");
+            const closePasswordModal =
+               document.getElementById("closePasswordModal");
+            const updateProfileBtn =
+               document.getElementById("updateProfileBtn");
+            const updatePasswordBtn =
+               document.getElementById("updatePasswordBtn");
+            const updateProfileForm =
+               document.getElementById("updateProfileForm");
+            const updatePasswordForm =
+               document.getElementById("updatePasswordForm");
+
+            // Function to open a modal
+            function openModal(modal) {
+               modal.style.display = "block";
+            }
+
+            // Function to close a modal
+            function closeModal(modal) {
+               modal.style.display = "none";
+            }
+
+            // Event listener for Edit button
+            editBtn.addEventListener("click", () => {
+               openModal(updateOptionsModal);
+            });
+
+            // Event listeners for closing modals
+            closeOptionsModal.addEventListener("click", () => {
+               closeModal(updateOptionsModal);
+            });
+
+            closeProfileModal.addEventListener("click", () => {
+               closeModal(updateProfileModal);
+            });
+
+            closePasswordModal.addEventListener("click", () => {
+               closeModal(updatePasswordModal);
+            });
+
+            // Event listener for Update Profile button
+            updateProfileBtn.addEventListener("click", () => {
+               closeModal(updateOptionsModal);
+               openModal(updateProfileModal);
+            });
+
+            // Event listener for Update Password button
+            updatePasswordBtn.addEventListener("click", () => {
+               closeModal(updateOptionsModal);
+               openModal(updatePasswordModal);
+            });
+
+            // Handle Update Profile form submission
+            updateProfileForm.addEventListener("submit", async (event) => {
+               event.preventDefault();
+               const formData = new FormData(updateProfileForm);
+               const data = {
+                  name: formData.get("name"),
+                  email: formData.get("email"),
+               };
+
+               try {
+                  const response = await fetch(
+                     "http://127.0.0.1:5000/api/users/updateUser",
+                     {
+                        method: "PATCH",
+                        headers: {
+                           "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                     }
+                  );
+
+                  if (!response.ok) {
+                     throw new Error("Failed to update profile");
+                  }
+
+                  const result = await response.json();
+                  alert("Profile updated successfully");
+                  closeModal(updateProfileModal);
+                  // Optionally, update the displayed profile information
+                  document.getElementById("name").value = result.name;
+                  document.getElementById("email").value = result.email;
+               } catch (error) {
+                  console.error("Error updating profile:", error);
+                  alert("Error updating profile");
+               }
+            });
+
+            // Handle Update Password form submission
+            updatePasswordForm.addEventListener("submit", async (event) => {
+               event.preventDefault();
+               const formData = new FormData(updatePasswordForm);
+               const data = {
+                  oldPassword: formData.get("oldPassword"),
+                  newPassword: formData.get("newPassword"),
+               };
+
+               try {
+                  const response = await fetch(
+                     "http://127.0.0.1:5000/api/users/updateUserPassword",
+                     {
+                        method: "PATCH",
+                        headers: {
+                           "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                     }
+                  );
+
+                  if (!response.ok) {
+                     throw new Error("Failed to update password");
+                  }
+
+                  alert("Password updated successfully");
+                  closeModal(updatePasswordModal);
+               } catch (error) {
+                  console.error("Error updating password:", error);
+                  alert("Error updating password");
+               }
+            });
+
+            // Close modals when clicking outside of them
+            window.addEventListener("click", (event) => {
+               if (event.target === updateOptionsModal) {
+                  closeModal(updateOptionsModal);
+               } else if (event.target === updateProfileModal) {
+                  closeModal(updateProfileModal);
+               } else if (event.target === updatePasswordModal) {
+                  closeModal(updatePasswordModal);
+               }
+            });
+         });
+      </script>
+      <script src="./static/js/coman/currentUser.js"></script>
+   </body>
+</html>

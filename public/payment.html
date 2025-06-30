@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Secure Payment</title>
+      <script src="https://js.stripe.com/v3/"></script>
+      <link rel="stylesheet" href="./static/css/user/payment.css" />
+   </head>
+   <body>
+      <div class="container">
+         <div class="cart-container">
+            <h2>Product Details</h2>
+            <div class="product-details"></div>
+
+            <div class="price-details">
+               <h2>Price Details</h2>
+               <p>Subtotal: <span id="subtotal">₹0</span></p>
+               <p>Shipping Fee: <span id="shipping">₹50</span></p>
+               <hr />
+               <p class="order-total">
+                  Order Total: <span id="total">₹0</span>
+               </p>
+            </div>
+         </div>
+         <div class="payment-container">
+            <h2>Secure Payment</h2>
+            <div class="form-group">
+               <label for="card-element">Card Details</label>
+               <div id="card-element" class="card-element"></div>
+            </div>
+            <button id="submit-button">Pay Now</button>
+            <div class="error-message" id="error-message"></div>
+         </div>
+      </div>
+
+      <script>
+         const stripe = Stripe(
+            "pk_test_51QuTIE2UJMTuoy4fzrsCrPeMWS956B3bQD4XR6UJKAOIz3toz6fxCJzlwjyXJYkkIvE86KzwBNyXhYN8ICFdBioC00ipeLKcRt"
+         );
+         const elements = stripe.elements();
+         const card = elements.create("card");
+         card.mount("#card-element");
+
+         const submitButton = document.getElementById("submit-button");
+         const errorMessage = document.getElementById("error-message");
+
+         let cartItems = [];
+
+         async function fetchCartItems() {
+            try {
+               const response = await fetch("http://127.0.0.1:5000/api/cart", {
+                  method: "GET",
+                  credentials: "include",
+               });
+
+               if (!response.ok) {
+                  throw new Error("Failed to fetch cart items");
+               }
+
+               cartItems = await response.json();
+               const productDetailsContainer =
+                  document.querySelector(".product-details");
+               productDetailsContainer.innerHTML = "";
+
+               let subtotal = 0;
+               cartItems.forEach((item) => {
+                  subtotal += item.price * item.quantity;
+                  const productCard = `
+                    <div class="product-card">
+                        <img src="http://127.0.0.1:5000/${item.image}" alt="${item.name}" />
+                        <div class="product-info">
+                            <h3>${item.name}</h3>
+                            <p>Category: ${item.category}</p>
+                            <p>Quantity: ${item.quantity}</p>
+                            <p class="price">₹${item.price}</p>
+                            <a href="#" class="remove" data-id="${item._id}">✖ REMOVE</a>
+                        </div>
+                    </div>
+                  `;
+                  productDetailsContainer.innerHTML += productCard;
+               });
+
+               const shippingFee = 50;
+               const total = subtotal + shippingFee;
+
+               document.getElementById("subtotal").textContent = `₹${subtotal}`;
+               document.getElementById(
+                  "shipping"
+               ).textContent = `₹${shippingFee}`;
+               document.getElementById("total").textContent = `₹${total}`;
+            } catch (error) {
+               alert("error : ", error.message);
+            }
+         }
+         fetchCartItems();
+         submitButton.addEventListener("click", async () => {
+            submitButton.disabled = true;
+            errorMessage.textContent = "";
+
+            const { paymentMethod, error } = await stripe.createPaymentMethod({
+               type: "card",
+               card: card,
+            });
+
+            if (error) {
+               errorMessage.textContent = error.message;
+               submitButton.disabled = false;
+               return;
+            }
+
+            if (!paymentMethod || !paymentMethod.id) {
+               errorMessage.textContent = "Failed to create payment method.";
+               submitButton.disabled = false;
+               return;
+            }
+
+            try {
+               const totalText = document
+                  .getElementById("total")
+                  .textContent.replace("₹", "")
+                  .trim();
+               const totalAmount = parseInt(totalText, 10) * 100;
+
+               console.log("Total Amount:", totalAmount);
+
+               const paymentResponse = await fetch(
+                  "http://127.0.0.1:5000/api/payment/create-payment-intent",
+                  {
+                     method: "POST",
+                     credentials: "include",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({
+                        amount: totalAmount,
+                        currency: "INR",
+                        paymentMethodId: paymentMethod.id,
+                     }),
+                  }
+               );
+
+               let paymentData;
+               try {
+                  paymentData = await paymentResponse.json();
+               } catch (error) {
+                  throw new Error("Invalid response from server.");
+               }
+
+               console.log("Payment Response:", paymentData);
+
+               if (!paymentResponse.ok || paymentData.status !== "succeeded") {
+                  throw new Error(paymentData.message || "Payment failed");
+               }
+               const orderResponse = await fetch(
+                  "http://127.0.0.1:5000/api/orders",
+                  {
+                     method: "POST",
+                     credentials: "include",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({ cartItems }),
+                  }
+               );
+
+               if (!orderResponse.ok) {
+                  throw new Error("Order placement failed");
+               }
+
+               const orderData = await orderResponse.json();
+               const orderId = orderData.order._id;
+               const updatePaymentResponse = await fetch(
+                  `http://127.0.0.1:5000/api/orders/${orderId}`,
+                  {
+                     method: "PATCH",
+                     credentials: "include",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({
+                        paymentStatus: "paid",
+                        paymentIntentId: paymentData.paymentIntentId,
+                     }),
+                  }
+               );
+
+               if (!updatePaymentResponse.ok) {
+                  throw new Error("Failed to update payment status");
+               }
+
+               await fetch("http://127.0.0.1:5000/api/cart", {
+                  method: "DELETE",
+                  credentials: "include",
+               });
+               window.location.href = "success.html";
+            } catch (error) {
+               errorMessage.textContent =
+                  error.message || "Payment request failed.";
+               submitButton.disabled = false;
+            }
+         });
+      </script>
+   </body>
+</html>

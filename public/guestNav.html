@@ -1,0 +1,85 @@
+<header id="header" class="header d-flex align-items-center fixed-top">
+   <div
+      class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between"
+   >
+      <a
+         href="index.html"
+         class="logo d-flex align-items-center me-auto me-xl-0"
+      >
+         <img src="./logo.jpeg" alt="" />
+         <h1 class="sitename">SHOPEASE</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+         <ul>
+            <li><a href="./index.html" class="active">Home</a></li>
+            <li><a href="./guestabout.html">About</a></li>
+            <li class="dropdown">
+               <a href="#"
+                  ><span>Categories</span>
+                  <i class="bi bi-chevron-down toggle-dropdown"></i>
+               </a>
+               <ul>
+                  <li>
+                     <a
+                        href="#"
+                        class="category-link"
+                        data-category=""
+                        onclick="fetchProducts()"
+                        >All</a
+                     >
+                  </li>
+                  <li>
+                     <a
+                        href="#"
+                        class="category-link"
+                        data-category="office"
+                        onclick="fetchProductsByCategory('office')"
+                        >Office</a
+                     >
+                  </li>
+                  <li>
+                     <a
+                        href="#"
+                        class="category-link"
+                        data-category="kitchen"
+                        onclick="fetchProductsByCategory('kitchen')"
+                        >Kitchen</a
+                     >
+                  </li>
+                  <li>
+                     <a
+                        href="#"
+                        class="category-link"
+                        data-category="bedroom"
+                        onclick="fetchProductsByCategory('bedroom')"
+                        >Bedroom</a
+                     >
+                  </li>
+               </ul>
+            </li>
+            <li><a href="./guestcontact.html">Contact</a></li>
+            <li>
+               <input
+                  class="search"
+                  type="text"
+                  id="searchInput"
+                  placeholder="Search for products"
+               />
+               <button onclick="searchProduct()">Search</button>
+            </li>
+            <li class="dropdown">
+               <a href="#" id="user-dropdown">
+                  <span id="username">Guest</span>
+                  <i class="bi bi-chevron-down toggle-dropdown"></i>
+               </a>
+               <ul>
+                  <li><a href="./register.html">Register</a></li>
+                  <li><a href="./login.html" id="logoutbtn">Login</a></li>
+               </ul>
+            </li>
+         </ul>
+         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+   </div>
+</header>

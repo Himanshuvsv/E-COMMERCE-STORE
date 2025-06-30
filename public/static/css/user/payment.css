@@ -1,0 +1,164 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+ }
+
+ body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8f9fa;
+ }
+
+ .container {
+    display: flex;
+    width: 80%;
+    gap: 20px;
+ }
+
+ .cart-container {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ }
+
+ .payment-container {
+    width: 400px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+ }
+
+ h2 {
+    margin-bottom: 20px;
+ }
+
+ .product-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+ }
+
+ .product-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 5px;
+ }
+
+ .product-info {
+    flex: 1;
+ }
+
+ .price {
+    font-weight: bold;
+    color: #007bff;
+ }
+
+ .remove {
+    color: red;
+    text-decoration: none;
+    font-size: 14px;
+ }
+
+ .price-details {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f1f1f1;
+    border-radius: 5px;
+ }
+
+ .price-details p {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    margin: 5px 0;
+ }
+
+ button {
+    width: 100%;
+    background: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+ }
+
+ button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+ }
+
+ .error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+ }
+
+ 
+ h2 {
+    margin-bottom: 20px;
+ }
+
+ .form-group {
+    margin-bottom: 15px;
+ }
+
+ label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: left;
+ }
+
+ .card-element {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: white;
+ }
+
+ button {
+    width: 100%;
+    background: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+ }
+
+ button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+ }
+
+ .error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+ }
+
+ .success-message {
+    color: green;
+    margin-top: 10px;
+    font-size: 14px;
+ }
+
+ .hidden {
+    display: none;
+ }

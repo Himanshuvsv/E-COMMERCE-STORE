@@ -1,0 +1,93 @@
+
+/* Header Section */
+.about-header {
+    background-color: #8caaca;
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* About Content */
+.about-content {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Paragraphs */
+.about-content p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* Headings */
+.about-content h2, .contact-us h2 {
+    color: #007bff;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+    margin-top: 20px;
+}
+
+/* List Styles */
+.about-content ul, .contact-us ul {
+    list-style: none;
+    padding: 0;
+}
+
+.about-content ul li, .contact-us ul li {
+    font-size: 1rem;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+}
+
+.about-content ul li::before, .contact-us ul li::before {
+    content: "✔";
+    color: #007bff;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Contact Us Section */
+.contact-us {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.contact-us p {
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.contact-us ul {
+    padding: 0;
+}
+
+.contact-us ul li {
+    font-size: 1rem;
+    padding: 10px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .about-content, .contact-us {
+        margin: 20px;
+        padding: 15px;
+    }
+    
+    .about-header {
+        font-size: 1.8rem;
+        padding: 30px 15px;
+    }
+}

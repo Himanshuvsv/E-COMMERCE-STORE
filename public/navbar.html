@@ -1,0 +1,112 @@
+<style>
+   #username {
+      border: 2px solid #000; 
+      background-color: #f8f9fa; 
+      text-align: center;
+      padding: 8px 12px; 
+      margin: 5px; 
+      border-radius: 12px; 
+      font-weight: bold;
+      font-size: 16px; 
+      color: #333; 
+      display: inline-block; 
+      min-width: 100px; 
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); 
+      transition: all 0.3s ease-in-out; 
+   }
+
+   #username:hover {
+      background-color: #e0e0e0; 
+      border-color: #555; 
+      transform: scale(1.05); 
+   }
+   
+</style>
+<header id="header" class="header d-flex align-items-center fixed-top">
+   <div
+      class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between"
+   >
+      <a
+         href="index.html"
+         class="logo d-flex align-items-center me-auto me-xl-0"
+      >
+         <img src="./logo.jpeg" alt="" />
+         <h1 class="sitename">SHOPEASE</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+         <ul>
+            <li><a href="./index2.html" class="active">Home</a></li>
+            <li class="dropdown">
+               <a href="#"
+                  ><span>Categories</span>
+                  <i class="bi bi-chevron-down toggle-dropdown"></i>
+               </a>
+               <ul>
+                  <li>
+                     <a
+                        href="#"
+                        class="category-link"
+                        data-category=""
+                        onclick="fetchProducts()"
+                        >All</a
+                     >
+                  </li>
+                  <li>
+                     <a
+                        href="#"
+                        class="category-link"
+                        data-category="office"
+                        onclick="fetchProductsByCategory('office')"
+                        >Office</a
+                     >
+                  </li>
+                  <li>
+                     <a
+                        href="#"
+                        class="category-link"
+                        data-category="kitchen"
+                        onclick="fetchProductsByCategory('kitchen')"
+                        >Kitchen</a
+                     >
+                  </li>
+                  <li>
+                     <a
+                        href="#"
+                        class="category-link"
+                        data-category="bedroom"
+                        onclick="fetchProductsByCategory('bedroom')"
+                        >Bedroom</a
+                     >
+                  </li>
+               </ul>
+            </li>
+            <li>
+               <input
+                  class="search"
+                  type="text"
+                  id="searchInput"
+                  placeholder="Search for products"
+               />
+               <button onclick="searchProduct()">Search</button>
+            </li>
+            <li><a href="./contact.html">Contact</a></li>
+            <li><a href="./wishlist.html">Wishlist</a></li>
+            <li><a href="./cart.html">Cart</a></li>
+            <li><a href="./viewOrder.html">Wallet</a></li>
+            <li class="dropdown">
+               <a href="#" id="user-dropdown">
+                  <span id="username">Loading...</span>
+                  <i class="bi bi-chevron-down toggle-dropdown"></i>
+               </a>
+               <ul>
+                  <li><a href="./profile.html" id="profileBtn">Profile</a></li>
+                  <li><a href="./paymentHistory.html">Payment History</a></li>
+                  <li><a href="./logout.html" id="logoutbtn">Logout</a></li>
+               </ul>
+            </li>
+         </ul>
+         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+   </div>
+</header>

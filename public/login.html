@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Login - SHOPEASE</title>
+      <link rel="stylesheet" href="./static/css/user/login.css" />
+   </head>
+   <body>
+      <div class="container">
+         <div class="header">
+            <img src="./logo.jpeg" alt="Logo" />
+            <h1 class="sitename">SHOPEASE</h1>
+         </div>
+         <form id="LoginForm">
+            <div class="form-group">
+               <label for="username">Username</label>
+               <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  placeholder="Enter your username"
+                  required
+               />
+            </div>
+            <div class="form-group">
+               <label for="password">Password</label>
+               <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  required
+               />
+            </div>
+            <button type="submit" class="btn">Login</button>
+         </form>
+         <li><a href="./register.html" id="forgot-password">For New Registration Click here</a></li>
+         <li><a href="./sendPasswordForgotEmail.html" id="forgot-password">Forgot your password from here</a></li>
+         <div class="footer">
+            <p>&copy; 2025 SHOPEASE. All rights reserved.</p>
+         </div>
+      </div>
+      <script>
+         document
+            .getElementById("LoginForm")
+            .addEventListener("submit", async (event) => {
+               event.preventDefault();
+
+               const email = document.getElementById("username").value;
+               const password = document.getElementById("password").value;
+
+               try {
+                  const response = await fetch(
+                     "http://127.0.0.1:5000/api/auth/login",
+                     {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, password }),
+                        credentials: "include",
+                     }
+                  );
+
+                  const data = await response.json();
+                  if (response.ok) {
+                     alert("Login successful!");
+                     if (data.user.role === "admin") {
+                        window.location.href = "dashboard.html";
+                     } else {
+                        window.location.href = "index2.html";
+                     }
+                  } else {
+                     alert(data.error || "Invalid login");
+                  }
+               } catch (error) {
+                  alert("Something went wrong. Please try again later.");
+               }
+            });
+      </script>
+   </body>
+</html>

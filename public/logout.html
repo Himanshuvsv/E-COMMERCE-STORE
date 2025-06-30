@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            console.log("Logout page loaded");
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/api/auth/logout", {
+                    method: "GET",
+                    credentials: "include"
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert("Logged out successfully!");
+                    window.location.href = "index.html";
+                }
+            } catch (error) {
+                console.error("Error logging out:", error);
+                alert("An error occurred during logout. Please try again.");
+                window.location.href = "index.html"; 
+            }
+        });
+    </script>
+</head>
+</html>

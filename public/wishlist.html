@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>My Products - Wishlist</title>
+      <link
+         rel="stylesheet"
+         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      />
+      <link rel="stylesheet" href="./static/css/user/wishlist.css" />
+      <link rel="stylesheet" href="./static/css/user/main.css" />
+   </head>
+   <body>
+      <div
+         id="navbar-container"
+         class="header d-flex align-items-center fixed-top"
+      ></div>
+      <div class="navbar-wishlist">
+         <h2>My Wishlist</h2>
+      </div>
+
+      <div class="wishlist-container">
+         <div class="tabs">
+            <div class="active">Wishlist</div>
+         </div>
+
+         <div class="toggle-container">
+            <span>Show in stock products only</span>
+            <input type="checkbox" class="toggle" />
+         </div>
+
+         <div class="product-grid">
+            <div class="product-card">
+               <i class="fa-solid fa-heart wishlist-icon"></i>
+               <img src="" alt="Sports Shoes" class="product-img" />
+               <p></p>
+               <p><strong>&#8377;</strong></p>
+               <span class="rating">★</span>
+            </div>
+         </div>
+      </div>
+      <div id="footer-placeholder"></div>
+      <script>
+         async function loadNavbar() {
+            try {
+               const response = await fetch("navbar.html");
+               const navbarHTML = await response.text();
+               document.getElementById("navbar-container").innerHTML =
+                  navbarHTML;
+            } catch (error) {
+               console.error("Error loading navbar:", error);
+            }
+         }
+         loadNavbar();
+
+         fetch("footer.html")
+            .then((response) => response.text())
+            .then((data) => {
+               document.getElementById("footer-placeholder").innerHTML = data;
+            })
+            .catch((error) => console.log("error loading footer", error));
+      </script>
+      <script src="./static/js/users/wishlisht.js"></script>
+      <script src="./static/js/coman/currentUser.js"></script>
+   </body>
+</html>

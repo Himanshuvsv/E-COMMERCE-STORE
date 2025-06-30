@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Admin Dashboard</title>
+      <link
+         rel="stylesheet"
+         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      />
+      <link
+         rel="stylesheet"
+         href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      />
+      <link rel="stylesheet" href="./static/css/admin/dashboard.css" />
+       <link rel="stylesheet" href="./static/css/admin/viewCustomers.css">
+      <style>
+         #productFilter {
+            padding: 7px;
+            width: auto;
+            margin: 10px 10px 10px 10px;
+         }
+         #searchOrder{
+            width: 90%;
+            margin-bottom: 10px;
+            margin-top: 10px;
+         }
+         #searchOrderButton {
+            border: 2px solid black;
+            font-weight: bolder;
+         }
+      </style>
+   </head>
+   <body>
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+         <a class="navbar-brand" href="#">
+            <img
+               src="./logo.jpeg"
+               width="30"
+               height="30"
+               class="d-inline-block align-top"
+               alt="Profile Image"
+            />
+            SHOPEASE DASHBOARD
+         </a>
+        
+         <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+               <li class="nav-item active">
+                  <a class="nav-link" href="./dashboard.html">Home</a>
+               </li>
+               
+               <li class="nav-item dropdown">
+                  <a
+                     class="nav-link dropdown-toggle"
+                     href="#"
+                     id="userDropdown"
+                     role="button"
+                     data-toggle="dropdown"
+                     aria-haspopup="true"
+                     aria-expanded="false"
+                  >
+                     <img
+                        src="./profile.png"
+                        width="30"
+                        height="30"
+                        class="rounded-circle"
+                        alt="User"
+                     />
+                     <span id="username">mazipan</span>
+                  </a>
+                  <div
+                     class="dropdown-menu dropdown-menu-right"
+                     aria-labelledby="userDropdown"
+                  >
+                     <a class="dropdown-item" href="./adminProfile.html"
+                        >Profile</a
+                     >
+                     <a class="dropdown-item text-danger" href="./logout.html"
+                        >Log Out</a
+                     >
+                  </div>
+               </li>
+            </ul>
+         </div>
+      </nav>
+      <!-- Sidebar and Main Content -->
+      <div class="d-flex">
+         <div class="sidebar p-3">
+            <div class="header text-center">
+               <h1 style="color: red">SHOPESEA</h1>
+            </div>
+            <ul class="list-unstyled">
+               <li><a href="./dashboard.html">Dashboard</a></li>
+               <li><a href="./viewCustommerce.html">Customers</a></li>
+               <li><a href="./add-products.html">Add Products</a></li>
+               <li><a href="./adminProductList.html">Manage Products</a></li>
+               <li><a href="./orders.html">Orders</a></li>
+               <li><a href="./adminReviews.html">Reviews</a></li>
+               <li><a href="./adminPaymentHistory.html">Payments</a></li>
+               <li><a class="text-danger" href="./logout.html">Log Out</a></li>
+            </ul>
+         </div>
+         <div class="container">
+            <h2>Reviews By the Users</h2>
+
+            <label for="productFilter">Filter by Product:</label>
+            <select id="productFilter" onchange="fetchProductReviews()">
+               <option value="">All Products</option>
+            </select> <br>
+            <input
+               id="searchOrder"
+               type="text"
+               class="search-bar"
+               placeholder="Search orders..."
+               onkeypress="handleKeyPress(event)"
+            />
+            <button id="searchOrderButton" type="submit">Search</button>
+
+            <table>
+               <thead>
+                  <tr>
+                     <th>Review Id</th>
+                     <th>Product Name</th>
+                     <th>Image</th>
+                     <th>User Name</th>
+                     <th>Title</th>
+                     <th>Comment</th>
+                     <th>Rating</th>
+                  </tr>
+               </thead>
+               <tbody id="reviewsTable"></tbody>
+            </table>
+         </div>
+      </div>
+
+      <script>
+         const apiBase = "http://127.0.0.1:5000/api/reviews";
+
+         async function fetchReviews() {
+            try {
+               const response = await fetch(apiBase);
+               const data = await response.json();
+               displayReviews(data.reviews);
+            } catch (error) {
+               console.error("Error fetching reviews:", error);
+            }
+         }
+
+         function getStarRating(rating) {
+            let stars = "";
+            for (let i = 1; i <= 5; i++) {
+               stars += `<span style="color: #FFA500; font-size: 20px; font-weight: bold;">${
+                  i <= rating ? "★" : "☆"
+               }</span>`;
+            }
+            return stars;
+         }
+
+         function displayReviews(reviews) {
+            const tableBody = document.getElementById("reviewsTable");
+            tableBody.innerHTML = "";
+
+            reviews.forEach((review) => {
+               const row = `<tr>
+                    <td>${review._id}</td>
+                    <td>${review.product.name}</td>
+                    <td><img src="http://127.0.0.1:5000/${
+                       review.product.image
+                    }" alt="${
+                  review.product.name
+               }" height="60px" width="60px"></td>
+                    <td>${review.user.name || "Anonymous"}</td>
+                    <td>${review.title}</td>
+                    <td>${review.comment}</td>
+                    <td>${getStarRating(review.rating)}</td>
+                </tr>`;
+               tableBody.innerHTML += row;
+            });
+         }
+
+         async function fetchProductReviews() {
+            const productId = document.getElementById("productFilter").value;
+            if (!productId) {
+               return fetchReviews();
+            }
+            try {
+               const response = await fetch(`${apiBase}/product/${productId}`);
+               const data = await response.json();
+               displayReviews(data.reviews);
+            } catch (error) {
+               console.error("Error fetching product reviews:", error);
+            }
+         }
+
+         async function loadProductOptions() {
+            try {
+               const response = await fetch(
+                  "http://127.0.0.1:5000/api/products"
+               );
+               const data = await response.json();
+               const productFilter = document.getElementById("productFilter");
+               data.products.forEach((product) => {
+                  const option = document.createElement("option");
+                  option.value = product._id;
+                  option.textContent = product.name;
+                  productFilter.appendChild(option);
+               });
+            } catch (error) {
+               console.error("Error fetching products:", error);
+            }
+         }
+
+         document.addEventListener("DOMContentLoaded", () => {
+            fetchReviews();
+            loadProductOptions();
+         });
+      </script>
+
+      <script src="./static/js/coman/currentUser.js"></script>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+   </body>
+</html>

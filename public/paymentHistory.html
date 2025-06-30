@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Payment History</title>
+      <link rel="stylesheet" href="./static/css/user/paymentHistory.css" />
+      <link rel="stylesheet" href="./static/css/user/main.css">
+   </head>
+   <body>
+      <div
+         id="navbar-container"
+         class="header d-flex align-items-center fixed-top"
+      ></div>
+      <div class="container">
+         <h2>Transactions</h2>
+         <div class="filters">
+            <button id="allBtn" class="active">All <strong> 0</strong></button>
+            <button id="succeededBtn">Succeeded  <strong> 0</strong></button>
+            <button id="refundedBtn">Refunded  <strong> 0</strong></button>
+            <button id="disputedBtn">Disputed <strong> 0</strong></button>
+            <button id="failedBtn">Failed <strong> 0</strong></button>
+         </div>
+         <table>
+            <thead>
+               <tr>
+                  <th>Amount</th>
+                  <th>Currency</th>
+                  <th>Status</th>
+                  <th>Payment Method</th>
+                  <th>Description</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Refunded Date</th>
+               </tr>
+            </thead>
+            <tbody id="paymentTableBody">
+               <tr>
+                  <td colspan="8" style="text-align: center">Loading...</td>
+               </tr>
+            </tbody>
+         </table>
+      </div>
+      <div id="footer-placeholder"></div>
+      <script>
+         async function loadNavbar() {
+            try {
+               const response = await fetch("navbar.html");
+               const navbarHTML = await response.text();
+               document.getElementById("navbar-container").innerHTML =
+                  navbarHTML;
+            } catch (error) {
+               console.error("Error loading navbar:", error);
+            }
+         }
+         loadNavbar();
+
+         fetch("footer.html")
+            .then((response) => response.text())
+            .then((data) => {
+               document.getElementById("footer-placeholder").innerHTML = data;
+            })
+            .catch((error) => console.log("error loading footer", error));
+
+         async function fetchPaymentHistory() {
+            try {
+               const response = await fetch(
+                  "http://127.0.0.1:5000/api/payment/paymentHistory"
+               );
+               const data = await response.json();
+               const tableBody = document.getElementById("paymentTableBody");
+               const allBtn = document.getElementById("allBtn");
+               const succeededBtn = document.getElementById("succeededBtn");
+               const refundedBtn = document.getElementById("refundedBtn");
+               const disputedBtn = document.getElementById("disputedBtn");
+               const failedBtn = document.getElementById("failedBtn");
+
+               tableBody.innerHTML = "";
+
+               let succeededCount = 0,
+                  refundedCount = 0,
+                  disputedCount = 0,
+                  failedCount = 0;
+
+               data.payments.forEach((payment) => {
+                  if (payment.status === "succeeded") succeededCount++;
+                  if (payment.status === "refunded") refundedCount++;
+                  if (payment.status === "disputed") disputedCount++;
+                  if (payment.status === "failed") failedCount++;
+                  const formattedAmount = payment.amount
+                     ? `₹${(payment.amount / 100).toFixed(2)}`
+                     : "-";
+
+                  const row = document.createElement("tr");
+                  row.innerHTML = `
+                <td>${formattedAmount}</td>
+                <td>INR</td>
+                <td class="status my-4 ${payment.status}">${
+                     payment.status
+                        ? payment.status.charAt(0).toUpperCase() +
+                          payment.status.slice(1)
+                        : "-"
+                  }</td>
+                <td>${payment.paymentMethod || "Visa **** 4242"}</td>
+                <td>${payment.description || "-"}</td>
+                <td>${payment.customer || "-"}</td>
+                <td>${
+                   payment.date ? new Date(payment.date).toLocaleString() : "-"
+                }</td>
+                <td>${
+                   payment.refundedDate
+                      ? new Date(payment.refundedDate).toLocaleString()
+                      : "-"
+                }</td>
+            `;
+                  tableBody.appendChild(row);
+               });
+
+               allBtn.innerHTML = `All <strong>${data.payments.length}</strong>`;
+               succeededBtn.innerHTML = `Succeeded <strong>${succeededCount}</strong>`;
+               refundedBtn.innerHTML = `Refunded <strong>${refundedCount}</strong>`;
+               disputedBtn.innerHTML = `Disputed <strong>${disputedCount}</strong>`;
+               failedBtn.innerHTML = `Failed <strong>${failedCount}</strong>`;
+            } catch (error) {
+               console.error("Error fetching payment history:", error);
+            }
+         }
+         fetchPaymentHistory();
+      </script>
+      <script src="./static/js/coman/currentUser.js"></script>
+   </body>
+</html>
