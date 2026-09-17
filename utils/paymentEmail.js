@@ -21,10 +21,9 @@ const paymentEmail = async (name, email, paymentIntent) => {
  
        await sgMail.send(msg);
     } catch (error) {
-      throw new Error(error)
+      console.error("Failed to send payment email:", error.message);
     }
  };
 
 
  module.exports = paymentEmail
- 
