@@ -24,32 +24,22 @@
          </div>
       </main>
 
+      <script src="./static/js/coman/api.js"></script>
       <script>
          document.addEventListener("DOMContentLoaded", async () => {
             const message = document.getElementById("logoutMessage");
+            clearToken();
 
             try {
-               const response = await fetch("/api/auth/logout", {
-                  method: "GET",
-                  credentials: "include",
-               });
-
-               if (response.ok) {
-                  message.textContent = "You are signed out. Redirecting…";
-                  setTimeout(() => {
-                     window.location.href = "index.html";
-                  }, 900);
-                  return;
-               }
-
-               throw new Error("Logout failed");
+               await fetch("/api/auth/logout", { method: "GET" });
             } catch (error) {
-               message.textContent =
-                  "We could not reach the server, but your session was cleared locally.";
-               setTimeout(() => {
-                  window.location.href = "index.html";
-               }, 1600);
+               /* local token is already cleared */
             }
+
+            message.textContent = "You are signed out. Redirecting…";
+            setTimeout(() => {
+               window.location.href = "index.html";
+            }, 900);
          });
       </script>
    </body>

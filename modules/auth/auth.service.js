@@ -1,62 +1,70 @@
 const crypto = require("crypto");
-const User = require("../user/user.model");
+const bcrypt = require("bcryptjs");
+const { sql, sqlOne, withCompat } = require("../../db/query");
 const CustomError = require("../../errors");
 const {
-   attachCookiesToResponse,
+   createTokenResponse,
    createTokenUser,
    forgotPasswordEmail,
 } = require("../../utils");
 
-const register = async ({ email, name, password, res }) => {
-   const emailAlreadyExists = await User.findOne({ where: { email } });
-   if (emailAlreadyExists) {
+const hashPassword = async (password) => {
+   const salt = await bcrypt.genSalt(10);
+   return bcrypt.hash(password, salt);
+};
+
+const register = async ({ email, name, password }) => {
+   const existing = await sqlOne(
+      `SELECT id FROM users WHERE email = $1 LIMIT 1`,
+      [email]
+   );
+   if (existing) {
       throw new CustomError.BadRequestError("Email already exists");
    }
 
-   const isFirstAccount = (await User.count()) === 0;
-   const role = isFirstAccount ? "admin" : "user";
-   const user = await User.create({ name, email, password, role });
-   const tokenUser = createTokenUser(user);
-   if (res) {
-      attachCookiesToResponse({ res, user: tokenUser });
-   }
-   return tokenUser;
+   const countRow = await sqlOne(`SELECT COUNT(*)::int AS count FROM users`);
+   const role = countRow.count === 0 ? "admin" : "user";
+   const hashed = await hashPassword(password);
+
+   const user = await sqlOne(
+      `INSERT INTO users (id, name, email, password, role, "walletBalance", "createdAt", "updatedAt")
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, 0, NOW(), NOW())
+       RETURNING id, name, email, role, "walletBalance", "createdAt", "updatedAt"`,
+      [name, email, hashed, role]
+   );
+
+   return createTokenResponse({ user: createTokenUser(withCompat(user)) });
 };
 
-const login = async ({ email, password, res }) => {
+const login = async ({ email, password }) => {
    if (!email || !password) {
       throw new CustomError.BadRequestError(
          "Please provide email and password"
       );
    }
 
-   const user = await User.findOne({ where: { email } });
+   const user = await sqlOne(
+      `SELECT * FROM users WHERE email = $1 LIMIT 1`,
+      [email]
+   );
    if (!user) {
       throw new CustomError.UnauthenticatedError(
          "User Not Found ! please provide correct User name"
       );
    }
 
-   const isPasswordCorrect = await user.comparePassword(password);
+   const isPasswordCorrect = await bcrypt.compare(password, user.password);
    if (!isPasswordCorrect) {
       throw new CustomError.UnauthenticatedError("Invalid Password");
    }
 
-   const tokenUser = createTokenUser(user);
-   attachCookiesToResponse({ res, user: tokenUser });
-   return tokenUser;
+   return createTokenResponse({
+      user: createTokenUser(withCompat(user)),
+   });
 };
 
-const logout = (res) => {
-   res.cookie("token", "logout", {
-      httpOnly: true,
-      expires: new Date(Date.now()),
-      maxAge: 0,
-      secure: false,
-      signed: true,
-      sameSite: "lax",
-      path: "/",
-   });
+const logout = () => {
+   return { msg: "user logged out" };
 };
 
 const forgotpasswordLink = async ({ email }) => {
@@ -64,16 +72,25 @@ const forgotpasswordLink = async ({ email }) => {
       throw new CustomError.BadRequestError("Please provide valid email");
    }
 
-   const user = await User.findOne({ where: { email } });
+   const user = await sqlOne(
+      `SELECT id, name, email FROM users WHERE email = $1 LIMIT 1`,
+      [email]
+   );
    if (!user) {
       throw new CustomError.BadRequestError(`No user with username : ${email}`);
    }
 
    const passwordToken = crypto.randomBytes(8).toString("hex");
-   const tenMinutes = 1000 * 60 * 10;
-   user.passwordToken = passwordToken;
-   user.passwordTokenExpirationDate = new Date(Date.now() + tenMinutes);
-   await user.save();
+   const tenMinutes = new Date(Date.now() + 1000 * 60 * 10);
+
+   await sql(
+      `UPDATE users
+       SET "passwordToken" = $1,
+           "passwordTokenExpirationDate" = $2,
+           "updatedAt" = NOW()
+       WHERE id = $3`,
+      [passwordToken, tenMinutes, user.id]
+   );
 
    await forgotPasswordEmail(user.name, email, passwordToken);
 };
@@ -83,23 +100,32 @@ const forgotpassword = async ({ token, email, password }) => {
       throw new CustomError.BadRequestError("Please provide all values");
    }
 
-   const user = await User.findOne({ where: { email } });
+   const user = await sqlOne(
+      `SELECT * FROM users WHERE email = $1 LIMIT 1`,
+      [email]
+   );
    if (!user) {
       throw new CustomError.NotFoundError("User not found");
    }
 
-   const currentDate = new Date();
    if (
       user.passwordToken !== token ||
-      user.passwordTokenExpirationDate <= currentDate
+      !user.passwordTokenExpirationDate ||
+      new Date(user.passwordTokenExpirationDate) <= new Date()
    ) {
       throw new CustomError.UnauthorizedError("Invalid or expired token");
    }
 
-   user.password = password;
-   user.passwordToken = null;
-   user.passwordTokenExpirationDate = null;
-   await user.save();
+   const hashed = await hashPassword(password);
+   await sql(
+      `UPDATE users
+       SET password = $1,
+           "passwordToken" = NULL,
+           "passwordTokenExpirationDate" = NULL,
+           "updatedAt" = NOW()
+       WHERE id = $2`,
+      [hashed, user.id]
+   );
 };
 
 module.exports = {

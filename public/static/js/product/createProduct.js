@@ -26,10 +26,9 @@ form.addEventListener("submit", async (event) => {
    submit.classList.add("is-busy");
 
    try {
-      const response = await fetch("/api/products", {
+      const response = await apiFetch("/api/products", {
          method: "POST",
          body: formData,
-         credentials: "include",
       });
 
       const data = await response.json();

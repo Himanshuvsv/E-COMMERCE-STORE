@@ -37,13 +37,12 @@ const showCurrentUser = async (req, res) => {
 const updateUser = async (req, res) => {
    try {
       const { email, name } = req.body;
-      const user = await userService.updateUser({
+      const { user, token } = await userService.updateUser({
          userId: req.user.userId,
          email,
          name,
-         res,
       });
-      res.status(StatusCodes.OK).json({ user });
+      res.status(StatusCodes.OK).json({ user, token });
    } catch (error) {
       const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
       res.status(statusCode).json({ error: error.message });

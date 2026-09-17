@@ -5,9 +5,8 @@ async function displayUsers() {
    if (!body) return;
 
    try {
-      const response = await fetch("/api/users", {
+      const response = await apiFetch("/api/users", {
          method: "GET",
-         credentials: "include",
          headers: { "Content-Type": "application/json" },
       });
 

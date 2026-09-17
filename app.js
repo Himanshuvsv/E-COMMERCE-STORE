@@ -4,7 +4,6 @@ require("express-async-errors");
 const express = require("express");
 const app = express();
 
-const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
@@ -23,42 +22,48 @@ const paymentRouter = require("./modules/payment/payment.routes");
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 
+const corsOrigins = [
+   "http://127.0.0.1:5050",
+   "http://localhost:5050",
+   "http://127.0.0.1:5000",
+   "http://localhost:5000",
+];
+
 app.set("trust proxy", 1);
-app.use(morgan("tiny"));
 app.use(
    cors({
-      origin: [
-         "http://127.0.0.1:5050",
-         "http://localhost:5050",
-         "http://127.0.0.1:5000",
-         "http://localhost:5000",
-      ],
+      origin: corsOrigins,
       credentials: true,
       methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
    })
 );
-app.options("*", cors({
-   origin: [
-      "http://127.0.0.1:5050",
-      "http://localhost:5050",
-      "http://127.0.0.1:5000",
-      "http://localhost:5000",
-   ],
-   credentials: true,
-}));
+app.options(
+   "*",
+   cors({
+      origin: corsOrigins,
+      credentials: true,
+   })
+);
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(express.static("./public"));
 app.use(fileUpload());
 
-app.use("/api/auth", authRouter);
-app.use("/api/users", userRouter);
-app.use("/api/products", productRouter);
-app.use("/api/reviews", reviewRouter);
-app.use("/api/cart", cartRouter);
-app.use("/api/orders", orderRouter);
-app.use("/api/wishlist", wishlistRouter);
-app.use("/api/payment", paymentRouter);
+const modules = [
+   { name: "auth", path: "/api/auth", router: authRouter },
+   { name: "user", path: "/api/users", router: userRouter },
+   { name: "product", path: "/api/products", router: productRouter },
+   { name: "review", path: "/api/reviews", router: reviewRouter },
+   { name: "cart", path: "/api/cart", router: cartRouter },
+   { name: "order", path: "/api/orders", router: orderRouter },
+   { name: "wishlist", path: "/api/wishlist", router: wishlistRouter },
+   { name: "payment", path: "/api/payment", router: paymentRouter },
+];
+
+for (const mod of modules) {
+   app.use(mod.path, mod.router);
+   console.log(`[module] ${mod.name} initialized (${mod.path})`);
+}
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
@@ -68,10 +73,10 @@ const start = async () => {
    try {
       await connectDB();
       app.listen(port, () =>
-         console.log(`Server is listening on port ${port}...`)
+         console.log(`[server] listening on port ${port}`)
       );
    } catch (error) {
-      console.log(error);
+      console.error("[server] failed to start", error);
    }
 };
 

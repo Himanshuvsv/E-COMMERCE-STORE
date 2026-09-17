@@ -27,7 +27,7 @@
       if (!badge) return;
 
       try {
-         const response = await fetch("/api/cart", { credentials: "include" });
+         const response = await apiFetch("/api/cart");
          if (!response.ok) return;
 
          const items = await response.json();

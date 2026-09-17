@@ -114,10 +114,9 @@ async function addToCart(product, modal) {
       confirm.classList.add("is-busy");
       confirm.disabled = true;
 
-      const response = await fetch("/api/cart", {
+      const response = await apiFetch("/api/cart", {
          method: "POST",
          headers: { "Content-Type": "application/json" },
-         credentials: "include",
          body: JSON.stringify({
             productId: product.id,
             quantity,

@@ -30,9 +30,8 @@ async function fetchMyOrders() {
    const container = document.getElementById("orders-container");
 
    try {
-      const response = await fetch("/api/orders/showAllMyOrders", {
+      const response = await apiFetch("/api/orders/showAllMyOrders", {
          method: "GET",
-         credentials: "include",
          headers: { "Content-Type": "application/json" },
       });
 
@@ -174,9 +173,8 @@ async function cancelOrder(orderId) {
    if (!confirm("Cancel this order?")) return;
 
    try {
-      const response = await fetch(`/api/orders/cancelOrder/${orderId}`, {
+      const response = await apiFetch(`/api/orders/cancelOrder/${orderId}`, {
          method: "POST",
-         credentials: "include",
          headers: { "Content-Type": "application/json" },
       });
 
@@ -189,9 +187,8 @@ async function cancelOrder(orderId) {
       toast("Order cancelled");
 
       try {
-         await fetch(`/api/payment/payment-refund/${orderId}`, {
+         await apiFetch(`/api/payment/payment-refund/${orderId}`, {
             method: "POST",
-            credentials: "include",
             headers: { "Content-Type": "application/json" },
          });
       } catch (refundError) {
@@ -266,9 +263,8 @@ async function submitReview(modal) {
    button.classList.add("is-busy");
 
    try {
-      const response = await fetch("/api/reviews/createReview", {
+      const response = await apiFetch("/api/reviews/createReview", {
          method: "POST",
-         credentials: "include",
          headers: { "Content-Type": "application/json" },
          body: JSON.stringify({
             product: button.dataset.productId,

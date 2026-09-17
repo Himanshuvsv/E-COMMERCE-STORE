@@ -234,9 +234,8 @@ async function updateProduct(id, modal) {
    save.classList.add("is-busy");
 
    try {
-      const response = await fetch(`/api/products/${id}`, {
+      const response = await apiFetch(`/api/products/${id}`, {
          method: "PATCH",
-         credentials: "include",
          body: formData,
       });
 

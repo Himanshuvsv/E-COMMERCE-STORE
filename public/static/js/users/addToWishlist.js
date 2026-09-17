@@ -1,9 +1,8 @@
 async function addToWishlist(productId) {
    try {
-      const response = await fetch("/api/wishlist", {
+      const response = await apiFetch("/api/wishlist", {
          method: "POST",
          headers: { "Content-Type": "application/json" },
-         credentials: "include",
          body: JSON.stringify({ productId }),
       });
 

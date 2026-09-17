@@ -104,6 +104,7 @@
          </div>
       </main>
 
+      <script src="./static/js/coman/api.js"></script>
       <script src="./static/js/coman/toast.js"></script>
       <script>
          const stripe = Stripe(
@@ -137,9 +138,8 @@
 
          async function fetchCartItems() {
             try {
-               const response = await fetch("/api/cart", {
+               const response = await apiFetch("/api/cart", {
                   method: "GET",
-                  credentials: "include",
                });
 
                if (!response.ok) throw new Error("Failed to fetch cart items");
@@ -212,11 +212,10 @@
                      10
                   ) * 100;
 
-               const paymentResponse = await fetch(
+               const paymentResponse = await apiFetch(
                   "/api/payment/create-payment-intent",
                   {
                      method: "POST",
-                     credentials: "include",
                      headers: { "Content-Type": "application/json" },
                      body: JSON.stringify({
                         amount: totalAmount,
@@ -232,9 +231,8 @@
                   throw new Error(paymentData.message || "Payment failed");
                }
 
-               const orderResponse = await fetch("/api/orders", {
+               const orderResponse = await apiFetch("/api/orders", {
                   method: "POST",
-                  credentials: "include",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ cartItems }),
                });
@@ -243,11 +241,10 @@
 
                const orderData = await orderResponse.json();
 
-               const updateResponse = await fetch(
+               const updateResponse = await apiFetch(
                   `/api/orders/${orderData.order._id}`,
                   {
                      method: "PATCH",
-                     credentials: "include",
                      headers: { "Content-Type": "application/json" },
                      body: JSON.stringify({
                         paymentStatus: "paid",
@@ -260,9 +257,8 @@
                   throw new Error("Failed to update payment status");
                }
 
-               await fetch("/api/cart", {
+               await apiFetch("/api/cart", {
                   method: "DELETE",
-                  credentials: "include",
                });
 
                window.location.href = "success.html";

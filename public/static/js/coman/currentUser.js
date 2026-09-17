@@ -3,9 +3,8 @@ async function fetchUser() {
    if (!nameNode) return;
 
    try {
-      const response = await fetch("/api/users/showMe", {
+      const response = await apiFetch("/api/users/showMe", {
          method: "GET",
-         credentials: "include",
          headers: { "Content-Type": "application/json" },
       });
 

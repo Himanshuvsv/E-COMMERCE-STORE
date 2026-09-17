@@ -2,9 +2,8 @@
 
 async function loadProfile() {
    try {
-      const response = await fetch("/api/users/showMe", {
+      const response = await apiFetch("/api/users/showMe", {
          method: "GET",
-         credentials: "include",
          headers: { "Content-Type": "application/json" },
       });
 
@@ -70,21 +69,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
          const formData = new FormData(profileForm);
          try {
-            const response = await fetch("/api/users/updateUser", {
+            const response = await apiFetch("/api/users/updateUser", {
                method: "PATCH",
-               headers: { "Content-Type": "application/json" },
-               credentials: "include",
-               body: JSON.stringify({
+               body: {
                   name: formData.get("name"),
                   email: formData.get("email"),
-               }),
+               },
             });
 
             if (!response.ok) throw new Error("Failed to update profile");
 
+            const data = await response.json();
+            if (data.token) setToken(data.token);
+
             closeProfileModal(document.getElementById("updateProfileModal"));
             toast("Profile updated");
             loadProfile();
+            if (window.fetchUser) window.fetchUser();
          } catch (error) {
             toastError("Could not update your profile");
          }
@@ -98,14 +99,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
          const formData = new FormData(passwordForm);
          try {
-            const response = await fetch("/api/users/updateUserPassword", {
+            const response = await apiFetch("/api/users/updateUserPassword", {
                method: "PATCH",
-               headers: { "Content-Type": "application/json" },
-               credentials: "include",
-               body: JSON.stringify({
+               body: {
                   oldPassword: formData.get("oldPassword"),
                   newPassword: formData.get("newPassword"),
-               }),
+               },
             });
 
             if (!response.ok) throw new Error("Failed to update password");

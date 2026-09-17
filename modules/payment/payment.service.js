@@ -1,12 +1,15 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const Payment = require("./payment.model");
-const Order = require("../order/order.model");
-const User = require("../user/user.model");
+const { sql, sqlOne, withCompat } = require("../../db/query");
 const { paymentEmail } = require("../../utils");
 const refundEmail = require("../../utils/refundEmail ");
 const { StatusCodes } = require("http-status-codes");
 
-const createPaymentIntent = async ({ user, amount, currency, paymentMethodId }) => {
+const createPaymentIntent = async ({
+   user,
+   amount,
+   currency,
+   paymentMethodId,
+}) => {
    if (!user) {
       const err = new Error("Unauthorized");
       err.statusCode = StatusCodes.UNAUTHORIZED;
@@ -42,14 +45,22 @@ const createPaymentIntent = async ({ user, amount, currency, paymentMethodId }) 
    });
 
    if (paymentIntent.status === "succeeded") {
-      await Payment.create({
-         userId: user.userId,
-         paymentIntentId: paymentIntent.id,
-         clientSecret: paymentIntent.client_secret,
-         amount,
-         currency,
-         status: "succeeded",
-      });
+      await sql(
+         `INSERT INTO payments (
+            id, "userId", "paymentIntentId", "clientSecret", amount, currency,
+            status, "refundedDate", "createdAt", "updatedAt"
+          ) VALUES (
+            gen_random_uuid(), $1, $2, $3, $4,
+            $5, 'succeeded', NULL, NOW(), NOW()
+          )`,
+         [
+            user.userId,
+            paymentIntent.id,
+            paymentIntent.client_secret,
+            amount,
+            currency,
+         ]
+      );
 
       await stripe.charges.update(paymentIntent.latest_charge, {
          receipt_email: user.email,
@@ -71,9 +82,20 @@ const createPaymentIntent = async ({ user, amount, currency, paymentMethodId }) 
 };
 
 const processRefund = async (orderId) => {
-   const order = await Order.findByPk(orderId, {
-      include: [{ model: User, as: "user" }],
-   });
+   const order = await sqlOne(
+      `SELECT
+         o.*,
+         json_build_object(
+           'id', u.id,
+           'name', u.name,
+           'email', u.email
+         ) AS "user"
+       FROM orders o
+       JOIN users u ON u.id = o."userId"
+       WHERE o.id = $1
+       LIMIT 1`,
+      [orderId]
+   );
 
    if (!order) {
       const err = new Error("Order not found");
@@ -91,23 +113,35 @@ const processRefund = async (orderId) => {
       payment_intent: order.paymentIntentId,
    });
 
-   order.paymentStatus = "refunded";
-   await order.save();
+   await sql(
+      `UPDATE orders
+       SET "paymentStatus" = 'refunded', "updatedAt" = NOW()
+       WHERE id = $1`,
+      [orderId]
+   );
 
    const refundAmount = (refund.amount * 100) / 100;
    const refundedDate = refund.created
       ? new Date(refund.created * 1000)
       : null;
 
-   await Payment.create({
-      userId: order.userId,
-      paymentIntentId: order.paymentIntentId,
-      clientSecret: refund.id,
-      amount: refundAmount,
-      currency: refund.currency,
-      status: "refunded",
-      refundedDate,
-   });
+   await sql(
+      `INSERT INTO payments (
+         id, "userId", "paymentIntentId", "clientSecret", amount, currency,
+         status, "refundedDate", "createdAt", "updatedAt"
+       ) VALUES (
+         gen_random_uuid(), $1, $2, $3, $4,
+         $5, 'refunded', $6, NOW(), NOW()
+       )`,
+      [
+         order.userId,
+         order.paymentIntentId,
+         refund.id,
+         refundAmount,
+         refund.currency,
+         refundedDate,
+      ]
+   );
 
    refundEmail(
       order.user.name,
@@ -162,13 +196,18 @@ const getPaymentHistory = async (user) => {
       throw err;
    }
 
-   const payments = await Payment.findAll({
-      where: { userId: user.userId },
-      order: [["createdAt", "DESC"]],
-      include: [{ model: User, as: "user", attributes: ["email"] }],
-   });
+   const payments = await sql(
+      `SELECT
+         p.*,
+         json_build_object('email', u.email) AS "user"
+       FROM payments p
+       LEFT JOIN users u ON u.id = p."userId"
+       WHERE p."userId" = $1
+       ORDER BY p."createdAt" DESC`,
+      [user.userId]
+   );
 
-   return formatPayments(payments);
+   return formatPayments(payments.map(withCompat));
 };
 
 const getAllPayments = async (user) => {
@@ -178,11 +217,16 @@ const getAllPayments = async (user) => {
       throw err;
    }
 
-   const payments = await Payment.findAll({
-      include: [{ model: User, as: "user", attributes: ["email"] }],
-   });
+   const payments = await sql(
+      `SELECT
+         p.*,
+         json_build_object('email', u.email) AS "user"
+       FROM payments p
+       LEFT JOIN users u ON u.id = p."userId"
+       ORDER BY p."createdAt" DESC`
+   );
 
-   return formatPayments(payments);
+   return formatPayments(payments.map(withCompat));
 };
 
 module.exports = {

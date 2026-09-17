@@ -75,6 +75,7 @@
          </div>
       </main>
 
+      <script src="./static/js/coman/api.js"></script>
       <script src="./static/js/coman/toast.js"></script>
       <script>
          document
@@ -96,12 +97,12 @@
                      method: "POST",
                      headers: { "Content-Type": "application/json" },
                      body: JSON.stringify({ email, password }),
-                     credentials: "include",
                   });
 
                   const data = await response.json();
 
                   if (response.ok) {
+                     setToken(data.token);
                      toast("Signed in");
                      window.location.href =
                         data.user.role === "admin"

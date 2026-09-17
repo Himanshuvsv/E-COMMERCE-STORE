@@ -99,6 +99,7 @@
          </div>
       </main>
 
+      <script src="./static/js/coman/api.js"></script>
       <script src="./static/js/coman/toast.js"></script>
       <script>
          document
@@ -127,27 +128,24 @@
                   const response = await fetch("/api/auth/register", {
                      method: "POST",
                      headers: { "Content-Type": "application/json" },
-                     credentials: "include",
                      body: JSON.stringify({ name, email, password }),
                   });
 
+                  const data = await response.json().catch(() => ({}));
+
                   if (response.ok) {
+                     if (data.token) setToken(data.token);
                      toast("Account created");
-                     window.location.href = "login.html";
+                     window.location.href =
+                        data.user && data.user.role === "admin"
+                           ? "dashboard.html"
+                           : "index2.html";
                      return;
                   }
 
-                  const errorText = await response.text();
                   submit.disabled = false;
                   submit.classList.remove("is-busy");
-
-                  try {
-                     toastError(
-                        JSON.parse(errorText).msg || "Could not register"
-                     );
-                  } catch (parseError) {
-                     toastError(errorText || "Could not register");
-                  }
+                  toastError(data.msg || data.error || "Could not register");
                } catch (error) {
                   submit.disabled = false;
                   submit.classList.remove("is-busy");

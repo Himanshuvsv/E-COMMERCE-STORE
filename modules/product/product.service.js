@@ -1,7 +1,5 @@
 const path = require("path");
-const { Op } = require("sequelize");
-const Product = require("./product.model");
-const Review = require("../review/review.model");
+const { sql, sqlOne, withCompat, withCompatMany } = require("../../db/query");
 const CustomError = require("../../errors");
 
 const createProduct = async ({ body, files, userId }) => {
@@ -27,65 +25,122 @@ const createProduct = async ({ body, files, userId }) => {
       data.image = `/uploads/${productImage.name}`;
    }
 
-   if (typeof data.colors === "string") {
+   let colors = data.colors;
+   if (typeof colors === "string") {
       try {
-         data.colors = JSON.parse(data.colors);
+         colors = JSON.parse(colors);
       } catch {
-         data.colors = [data.colors];
+         colors = colors.split(",").map((c) => c.trim()).filter(Boolean);
       }
    }
+   if (!Array.isArray(colors)) colors = ["#222"];
 
-   return Product.create(data);
+   const product = await sqlOne(
+      `INSERT INTO products (
+         id, name, price, description, image, category, company, colors,
+         featured, "freeShipping", inventory, "averageRating", "numOfReviews",
+         "userId", "isDeleted", "createdAt", "updatedAt"
+       ) VALUES (
+         gen_random_uuid(), $1, $2, $3, $4, $5, $6,
+         $7::jsonb, $8, $9, $10, 0, 0,
+         $11, false, NOW(), NOW()
+       )
+       RETURNING *`,
+      [
+         data.name,
+         Number(data.price) || 0,
+         data.description,
+         data.image || "/uploads/example.jpeg",
+         data.category,
+         data.company,
+         JSON.stringify(colors),
+         data.featured === true || data.featured === "true",
+         data.freeShipping === true || data.freeShipping === "true",
+         Number(data.inventory) || 15,
+         userId,
+      ]
+   );
+
+   return withCompat(product);
 };
 
-const getAllProducts = async ({ category, name }) => {
-   const where = {};
+const buildProductFilter = ({ category, name }) => {
+   const clauses = [];
+   const params = [];
+
+   if (category) {
+      params.push(category.toLowerCase());
+      clauses.push(`category = $${params.length}`);
+   }
 
    if (name) {
       const words = name.trim().split(/\s+/).filter(Boolean);
-      where[Op.and] = words.map((word) => ({
-         name: { [Op.iLike]: `%${word}%` },
-      }));
+      words.forEach((word) => {
+         params.push(`%${word}%`);
+         clauses.push(`name ILIKE $${params.length}`);
+      });
    }
 
-   if (category) {
-      where.category = category.toLowerCase();
-   }
+   return {
+      whereSql: clauses.length ? `WHERE ${clauses.join(" AND ")}` : "",
+      params,
+   };
+};
 
-   let products = await Product.findAll({ where });
+const getAllProducts = async ({ category, name }) => {
+   const { whereSql, params } = buildProductFilter({ category, name });
 
-   const productsToDelete = products.filter((product) => product.inventory === 0);
-   if (productsToDelete.length > 0) {
-      const deleteIds = productsToDelete.map((product) => product.id);
-      await Product.destroy({ where: { id: { [Op.in]: deleteIds } } });
-      products = await Product.findAll({ where });
-   }
+   await sql(
+      `DELETE FROM products
+       WHERE inventory = 0
+       ${whereSql ? `AND id IN (SELECT id FROM products ${whereSql})` : ""}`,
+      params
+   );
 
-   const totalStock = products.reduce(
-      (acc, product) => acc + product.inventory,
+   const products = await sql(
+      `SELECT * FROM products ${whereSql} ORDER BY "createdAt" DESC`,
+      params
+   );
+
+   const mapped = withCompatMany(products);
+   const totalStock = mapped.reduce(
+      (acc, product) => acc + Number(product.inventory || 0),
       0
    );
 
    return {
-      numberOfProducts: products.length,
+      numberOfProducts: mapped.length,
       totalStock,
-      products,
+      products: mapped,
    };
 };
 
 const getSingleProduct = async (productId) => {
-   const product = await Product.findByPk(productId, {
-      include: [{ model: Review, as: "reviews" }],
-   });
+   const product = await sqlOne(
+      `SELECT * FROM products WHERE id = $1 LIMIT 1`,
+      [productId]
+   );
    if (!product) {
       throw new CustomError.NotFoundError(`No product with id : ${productId}`);
    }
-   return product;
+
+   const reviews = await sql(
+      `SELECT * FROM reviews WHERE "productId" = $1 ORDER BY "createdAt" DESC`,
+      [productId]
+   );
+
+   return withCompat({
+      ...product,
+      reviews: withCompatMany(reviews),
+   });
 };
 
 const updateProduct = async (productId, body) => {
-   const product = await Product.findByPk(productId);
-   if (!product) {
+   const existing = await sqlOne(
+      `SELECT * FROM products WHERE id = $1 LIMIT 1`,
+      [productId]
+   );
+   if (!existing) {
       throw new CustomError.NotFoundError(`No product with id : ${productId}`);
    }
 
@@ -94,27 +149,68 @@ const updateProduct = async (productId, body) => {
       data.userId = data.user;
       delete data.user;
    }
-   if (typeof data.colors === "string") {
+
+   let colors = data.colors !== undefined ? data.colors : existing.colors;
+   if (typeof colors === "string") {
       try {
-         data.colors = JSON.parse(data.colors);
+         colors = JSON.parse(colors);
       } catch {
-         data.colors = [data.colors];
+         colors = colors.split(",").map((c) => c.trim()).filter(Boolean);
       }
    }
 
-   await product.update(data);
-   return product;
+   const product = await sqlOne(
+      `UPDATE products SET
+         name = $1,
+         price = $2,
+         description = $3,
+         image = $4,
+         category = $5,
+         company = $6,
+         colors = $7::jsonb,
+         featured = $8,
+         "freeShipping" = $9,
+         inventory = $10,
+         "userId" = $11,
+         "updatedAt" = NOW()
+       WHERE id = $12
+       RETURNING *`,
+      [
+         data.name ?? existing.name,
+         data.price != null ? Number(data.price) : existing.price,
+         data.description ?? existing.description,
+         data.image ?? existing.image,
+         data.category ?? existing.category,
+         data.company ?? existing.company,
+         JSON.stringify(colors || ["#222"]),
+         data.featured != null
+            ? data.featured === true || data.featured === "true"
+            : existing.featured,
+         data.freeShipping != null
+            ? data.freeShipping === true || data.freeShipping === "true"
+            : existing.freeShipping,
+         data.inventory != null ? Number(data.inventory) : existing.inventory,
+         data.userId ?? existing.userId,
+         productId,
+      ]
+   );
+
+   return withCompat(product);
 };
 
 const deleteProduct = async (productId) => {
-   const product = await Product.findByPk(productId);
+   const product = await sqlOne(
+      `SELECT id FROM products WHERE id = $1 LIMIT 1`,
+      [productId]
+   );
    if (!product) {
       throw new CustomError.BadRequestError(
          `no product with id : ${productId}`
       );
    }
-   await Review.destroy({ where: { productId } });
-   await product.destroy();
+
+   await sql(`DELETE FROM reviews WHERE "productId" = $1`, [productId]);
+   await sql(`DELETE FROM products WHERE id = $1`, [productId]);
 };
 
 module.exports = {

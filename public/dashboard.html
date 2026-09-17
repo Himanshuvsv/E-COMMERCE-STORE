@@ -103,6 +103,7 @@
          </main>
       </div>
 
+      <script src="./static/js/coman/api.js"></script>
       <script src="./static/js/coman/nav.js"></script>
       <script src="./static/js/coman/toast.js"></script>
       <script src="./static/js/coman/currentUser.js"></script>
@@ -127,9 +128,7 @@
 
          document.addEventListener("DOMContentLoaded", async () => {
             try {
-               const response = await fetch("/api/orders/dashbordData", {
-                  credentials: "include",
-               });
+               const response = await apiFetch("/api/orders/dashbordData");
                if (!response.ok) throw new Error("Failed to load stats");
 
                const data = await response.json();

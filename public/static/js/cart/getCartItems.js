@@ -4,9 +4,8 @@ async function fetchCartItems() {
    if (!list || !summary) return;
 
    try {
-      const response = await fetch("/api/cart", {
+      const response = await apiFetch("/api/cart", {
          method: "GET",
-         credentials: "include",
       });
 
       if (!response.ok) throw new Error("Failed to fetch cart items");
@@ -106,9 +105,8 @@ document.addEventListener("click", async (event) => {
 
 async function removeCartItem(productId) {
    try {
-      const response = await fetch(`/api/cart/${productId}`, {
+      const response = await apiFetch(`/api/cart/${productId}`, {
          method: "DELETE",
-         credentials: "include",
       });
 
       if (!response.ok) throw new Error("Failed to remove item from cart");

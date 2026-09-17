@@ -3,9 +3,8 @@ async function fetchWishlist() {
    if (!container) return;
 
    try {
-      const response = await fetch("/api/wishlist/showMyWishlist", {
+      const response = await apiFetch("/api/wishlist/showMyWishlist", {
          method: "GET",
-         credentials: "include",
       });
 
       if (!response.ok) throw new Error("Failed to fetch wishlist items");
@@ -64,9 +63,8 @@ document.addEventListener("click", async (event) => {
 
 async function removeFromWishlist(wishlistItemId) {
    try {
-      const response = await fetch(`/api/wishlist/${wishlistItemId}`, {
+      const response = await apiFetch(`/api/wishlist/${wishlistItemId}`, {
          method: "DELETE",
-         credentials: "include",
       });
 
       if (!response.ok) throw new Error("Failed to remove item");

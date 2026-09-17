@@ -3,8 +3,8 @@ const authService = require("./auth.service");
 
 const register = async (req, res) => {
    try {
-      const user = await authService.register({ ...req.body, res });
-      res.status(StatusCodes.CREATED).json({ user });
+      const { user, token } = await authService.register(req.body);
+      res.status(StatusCodes.CREATED).json({ user, token });
    } catch (error) {
       const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
       res.status(statusCode).json({ error: error.message });
@@ -13,8 +13,8 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
    try {
-      const user = await authService.login({ ...req.body, res });
-      res.status(StatusCodes.OK).json({ user });
+      const { user, token } = await authService.login(req.body);
+      res.status(StatusCodes.OK).json({ user, token });
    } catch (error) {
       const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
       res.status(statusCode).json({ error: error.message });
@@ -23,8 +23,8 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
    try {
-      authService.logout(res);
-      res.status(StatusCodes.OK).json({ msg: "user logged out!" });
+      const result = authService.logout();
+      res.status(StatusCodes.OK).json(result);
    } catch (error) {
       const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
       res.status(statusCode).json({ error: error.message });

@@ -44,9 +44,8 @@ async function loadProducts() {
 
 async function fetchWishlistItems() {
    try {
-      const response = await fetch("/api/wishlist/showMyWishlist", {
+      const response = await apiFetch("/api/wishlist/showMyWishlist", {
          method: "GET",
-         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to fetch wishlist items");
 
@@ -177,9 +176,8 @@ async function toggleWishlist(productId, favElement) {
       const wishlistId = wishlistMap.get(productId);
 
       if (wishlistId) {
-         const response = await fetch(`/api/wishlist/${wishlistId}`, {
+         const response = await apiFetch(`/api/wishlist/${wishlistId}`, {
             method: "DELETE",
-            credentials: "include",
          });
 
          if (!response.ok) {
@@ -193,10 +191,9 @@ async function toggleWishlist(productId, favElement) {
          return;
       }
 
-      const response = await fetch("/api/wishlist", {
+      const response = await apiFetch("/api/wishlist", {
          method: "POST",
          headers: { "Content-Type": "application/json" },
-         credentials: "include",
          body: JSON.stringify({ productId }),
       });
 

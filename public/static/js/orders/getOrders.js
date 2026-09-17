@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchOrderCounts() {
    try {
-      const response = await fetch("/api/orders", { credentials: "include" });
+      const response = await apiFetch("/api/orders");
       const data = await response.json();
       if (!data.orderStatusCounts) return;
 
@@ -69,9 +69,8 @@ async function fetchOrders(status = "all") {
             ? `/api/orders?status=${encodeURIComponent(status)}`
             : "/api/orders";
 
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
          method: "GET",
-         credentials: "include",
          headers: { "Content-Type": "application/json" },
       });
       const data = await response.json();
@@ -203,9 +202,8 @@ async function updateOrder(orderId, modal) {
    const status = modal.querySelector("#orderStatus").value;
 
    try {
-      const response = await fetch(`/api/orders/${orderId}`, {
+      const response = await apiFetch(`/api/orders/${orderId}`, {
          method: "PATCH",
-         credentials: "include",
          headers: { "Content-Type": "application/json" },
          body: JSON.stringify({ status }),
       });
@@ -226,9 +224,8 @@ async function deleteOrder(orderId) {
    if (!confirm("Delete this order? This cannot be undone.")) return;
 
    try {
-      const response = await fetch(`/api/orders/${orderId}`, {
+      const response = await apiFetch(`/api/orders/${orderId}`, {
          method: "DELETE",
-         credentials: "include",
          headers: { "Content-Type": "application/json" },
       });
 
@@ -249,9 +246,8 @@ async function searchOrders(query) {
          ? `/api/orders?orderId=${encodeURIComponent(query)}`
          : `/api/orders?name=${encodeURIComponent(query)}`;
 
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
          method: "GET",
-         credentials: "include",
          headers: { "Content-Type": "application/json" },
       });
       const data = await response.json();

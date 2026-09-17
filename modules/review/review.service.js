@@ -1,115 +1,171 @@
-const { fn, col } = require("sequelize");
-const Review = require("./review.model");
-const Product = require("../product/product.model");
-const User = require("../user/user.model");
+const { sql, sqlOne, withCompat, withCompatMany } = require("../../db/query");
 const CustomError = require("../../errors");
 const { checkPermissions } = require("../../utils");
 
 const calculateAverageRating = async (productId) => {
-   const result = await Review.findOne({
-      where: { productId },
-      attributes: [
-         [fn("AVG", col("rating")), "averageRating"],
-         [fn("COUNT", col("id")), "numOfReviews"],
-      ],
-      raw: true,
-   });
+   const result = await sqlOne(
+      `SELECT
+         COALESCE(CEIL(AVG(rating)), 0)::float AS "averageRating",
+         COUNT(*)::int AS "numOfReviews"
+       FROM reviews
+       WHERE "productId" = $1`,
+      [productId]
+   );
 
-   await Product.update(
-      {
-         averageRating: Math.ceil(Number(result?.averageRating) || 0),
-         numOfReviews: Number(result?.numOfReviews) || 0,
-      },
-      { where: { id: productId } }
+   await sql(
+      `UPDATE products
+       SET "averageRating" = $1,
+           "numOfReviews" = $2,
+           "updatedAt" = NOW()
+       WHERE id = $3`,
+      [
+         Number(result?.averageRating) || 0,
+         Number(result?.numOfReviews) || 0,
+         productId,
+      ]
    );
 };
 
 const createReview = async ({ body, userId }) => {
    const productId = body.product || body.productId;
-   const isValidProduct = await Product.findByPk(productId);
-   if (!isValidProduct) {
+   const product = await sqlOne(
+      `SELECT id FROM products WHERE id = $1 LIMIT 1`,
+      [productId]
+   );
+   if (!product) {
       throw new CustomError.NotFoundError(`No product with id : ${productId}`);
    }
 
-   const alreadySubmitted = await Review.findOne({
-      where: { productId, userId },
-   });
+   const alreadySubmitted = await sqlOne(
+      `SELECT id FROM reviews
+       WHERE "productId" = $1 AND "userId" = $2
+       LIMIT 1`,
+      [productId, userId]
+   );
    if (alreadySubmitted) {
       throw new CustomError.BadRequestError(
          "Already submitted review for this product"
       );
    }
 
-   const review = await Review.create({
-      rating: body.rating,
-      title: body.title,
-      comment: body.comment,
-      productId,
-      userId,
-   });
+   const review = await sqlOne(
+      `INSERT INTO reviews (
+         id, rating, title, comment, "userId", "productId", "createdAt", "updatedAt"
+       ) VALUES (
+         gen_random_uuid(), $1, $2, $3, $4, $5, NOW(), NOW()
+       )
+       RETURNING *`,
+      [body.rating, body.title, body.comment, userId, productId]
+   );
+
    await calculateAverageRating(productId);
-   return review;
+   return withCompat(review);
 };
 
 const getAllReviews = async () => {
-   const reviews = await Review.findAll({
-      include: [
-         {
-            model: Product,
-            as: "product",
-            attributes: ["id", "name", "company", "price", "image"],
-         },
-         {
-            model: User,
-            as: "user",
-            attributes: ["id", "name", "email"],
-         },
-      ],
-   });
-   return { reviews, count: reviews.length };
+   const reviews = await sql(
+      `SELECT
+         r.*,
+         json_build_object(
+           'id', p.id,
+           '_id', p.id,
+           'name', p.name,
+           'company', p.company,
+           'price', p.price,
+           'image', p.image
+         ) AS product,
+         json_build_object(
+           'id', u.id,
+           '_id', u.id,
+           'name', u.name,
+           'email', u.email
+         ) AS "user"
+       FROM reviews r
+       JOIN products p ON p.id = r."productId"
+       JOIN users u ON u.id = r."userId"
+       ORDER BY r."createdAt" DESC`
+   );
+
+   const mapped = withCompatMany(reviews);
+   return { reviews: mapped, count: mapped.length };
 };
 
 const getSingleReview = async (reviewId) => {
-   const review = await Review.findByPk(reviewId);
+   const review = await sqlOne(
+      `SELECT * FROM reviews WHERE id = $1 LIMIT 1`,
+      [reviewId]
+   );
    if (!review) {
       throw new CustomError.NotFoundError(`No review with id ${reviewId}`);
    }
-   return review;
+   return withCompat(review);
 };
 
-const updateReview = async ({ reviewId, rating, title, comment, requestUser }) => {
-   const review = await Review.findByPk(reviewId);
+const updateReview = async ({
+   reviewId,
+   rating,
+   title,
+   comment,
+   requestUser,
+}) => {
+   const review = await sqlOne(
+      `SELECT * FROM reviews WHERE id = $1 LIMIT 1`,
+      [reviewId]
+   );
    if (!review) {
       throw new CustomError.NotFoundError(`No review with id ${reviewId}`);
    }
 
    checkPermissions(requestUser, review.userId);
-   review.rating = rating;
-   review.title = title;
-   review.comment = comment;
-   await review.save();
+
+   const updated = await sqlOne(
+      `UPDATE reviews
+       SET rating = $1,
+           title = $2,
+           comment = $3,
+           "updatedAt" = NOW()
+       WHERE id = $4
+       RETURNING *`,
+      [rating, title, comment, reviewId]
+   );
+
    await calculateAverageRating(review.productId);
-   return review;
+   return withCompat(updated);
 };
 
 const deleteReview = async ({ reviewId, requestUser }) => {
-   const review = await Review.findByPk(reviewId);
+   const review = await sqlOne(
+      `SELECT * FROM reviews WHERE id = $1 LIMIT 1`,
+      [reviewId]
+   );
    if (!review) {
       throw new CustomError.NotFoundError(`No review with id ${reviewId}`);
    }
 
    checkPermissions(requestUser, review.userId);
    const productId = review.productId;
-   await review.destroy();
+   await sql(`DELETE FROM reviews WHERE id = $1`, [reviewId]);
    await calculateAverageRating(productId);
 };
 
 const getSingleProductReviews = async (productId) => {
-   const reviews = await Review.findAll({
-      where: { productId },
-      include: [{ model: User, as: "user" }],
-   });
-   return { reviews, count: reviews.length };
+   const reviews = await sql(
+      `SELECT
+         r.*,
+         json_build_object(
+           'id', u.id,
+           '_id', u.id,
+           'name', u.name,
+           'email', u.email
+         ) AS "user"
+       FROM reviews r
+       JOIN users u ON u.id = r."userId"
+       WHERE r."productId" = $1
+       ORDER BY r."createdAt" DESC`,
+      [productId]
+   );
+   const mapped = withCompatMany(reviews);
+   return { reviews: mapped, count: mapped.length };
 };
 
 module.exports = {
