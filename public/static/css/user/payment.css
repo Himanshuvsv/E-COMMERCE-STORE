@@ -1,164 +1,82 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
- }
+/* Checkout: summary above the card form on small screens, side by side on wide ones. */
 
- body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f8f9fa;
- }
+.checkout-layout {
+   display: grid;
+   grid-template-columns: 1fr;
+   gap: 20px;
+   align-items: start;
+}
 
- .container {
-    display: flex;
-    width: 80%;
-    gap: 20px;
- }
+@media (min-width: 900px) {
+   .checkout-layout {
+      grid-template-columns: minmax(0, 1fr) 360px;
+   }
 
- .cart-container {
-    flex: 1;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
- }
+   .checkout-layout > section {
+      order: 1 !important;
+   }
 
- .payment-container {
-    width: 400px;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
- }
+   .checkout-layout > aside {
+      order: 2 !important;
+   }
+}
 
- h2 {
-    margin-bottom: 20px;
- }
+.card-element {
+   padding: 12px 13px;
+   border: 1px solid var(--hair);
+   border-radius: var(--r-md);
+   background: var(--surface);
+}
 
- .product-card {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
- }
+.card-element.StripeElement--focus {
+   border-color: var(--accent);
+   box-shadow: 0 0 0 3px var(--accent-soft);
+}
 
- .product-card img {
-    width: 80px;
-    height: 80px;
-    border-radius: 5px;
- }
+.card-element.StripeElement--invalid {
+   border-color: var(--danger);
+}
 
- .product-info {
-    flex: 1;
- }
+.summary-item {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   padding: 12px 0;
+   border-bottom: 1px solid var(--hair-2);
+}
 
- .price {
-    font-weight: bold;
-    color: #007bff;
- }
+.summary-item:last-child {
+   border-bottom: 0;
+}
 
- .remove {
-    color: red;
-    text-decoration: none;
-    font-size: 14px;
- }
+.summary-item img {
+   width: 52px;
+   height: 52px;
+   flex: none;
+   border-radius: var(--r-sm);
+   object-fit: cover;
+   border: 1px solid var(--hair);
+}
 
- .price-details {
-    margin-top: 20px;
-    padding: 15px;
-    background: #f1f1f1;
-    border-radius: 5px;
- }
+.summary-item > div {
+   min-width: 0;
+   flex: 1;
+}
 
- .price-details p {
-    display: flex;
-    justify-content: space-between;
-    font-size: 16px;
-    margin: 5px 0;
- }
+.summary-item__name {
+   font-size: 14.5px;
+   font-weight: 600;
+   margin: 0 0 2px;
+}
 
- button {
-    width: 100%;
-    background: #007bff;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
- }
+.summary-item__meta {
+   font-size: 12.5px;
+   color: var(--muted);
+   margin: 0;
+}
 
- button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
- }
-
- .error-message {
-    color: red;
-    margin-top: 10px;
-    font-size: 14px;
- }
-
- 
- h2 {
-    margin-bottom: 20px;
- }
-
- .form-group {
-    margin-bottom: 15px;
- }
-
- label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    text-align: left;
- }
-
- .card-element {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background: white;
- }
-
- button {
-    width: 100%;
-    background: #007bff;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
- }
-
- button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
- }
-
- .error-message {
-    color: red;
-    margin-top: 10px;
-    font-size: 14px;
- }
-
- .success-message {
-    color: green;
-    margin-top: 10px;
-    font-size: 14px;
- }
-
- .hidden {
-    display: none;
- }
+.summary-item__price {
+   font-size: 14.5px;
+   font-weight: 600;
+   white-space: nowrap;
+}

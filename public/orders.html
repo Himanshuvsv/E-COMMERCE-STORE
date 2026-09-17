@@ -1,251 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Admin Dashboard</title>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Orders — ShopEase Admin</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
       <link
+         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap"
          rel="stylesheet"
-         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       />
-      <link
-         rel="stylesheet"
-         href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
-      />
-      <link rel="stylesheet" href="./static/css/admin/dashboard.css" />
-      <link rel="stylesheet" href="./static/css/admin/manageOrders.css" />
+      <link rel="stylesheet" href="./static/css/theme.css" />
    </head>
+
    <body>
-      <!-- Navbar -->
-      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-         <a class="navbar-brand" href="#">
-            <img
-               src="./logo.jpeg"
-               width="30"
-               height="30"
-               class="d-inline-block align-top"
-               alt="Profile Image"
-            />
-            SHOPEASE DASHBOARD
-         </a>
-        
-         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-               <li class="nav-item active">
-                  <a class="nav-link" href="./dashboard.html">Home</a>
-               </li>
-               
-               <li class="nav-item dropdown">
-                  <a
-                     class="nav-link dropdown-toggle"
-                     href="#"
-                     id="userDropdown"
-                     role="button"
-                     data-toggle="dropdown"
-                     aria-haspopup="true"
-                     aria-expanded="false"
-                  >
-                     <img
-                        src="./profile.png"
-                        width="30"
-                        height="30"
-                        class="rounded-circle"
-                        alt="User"
-                     />
-                     <span id="username">mazipan</span>
-                  </a>
-                  <div
-                     class="dropdown-menu dropdown-menu-right"
-                     aria-labelledby="userDropdown"
-                  >
-                     <a class="dropdown-item" href="./adminProfile.html"
-                        >Profile</a
-                     >
-                     <a class="dropdown-item text-danger" href="./logout.html"
-                        >Log Out</a
-                     >
-                  </div>
-               </li>
-            </ul>
-         </div>
-      </nav>
-      <!-- Sidebar and Main Content -->
-      <div class="d-flex">
-         <div class="sidebar p-3">
-            <div class="header text-center">
-               <h1 style="color: red">SHOPESEA</h1>
+      <div id="admin-header"></div>
+
+      <div class="admin">
+         <div id="admin-sidebar"></div>
+
+         <main class="admin-main">
+            <div class="head" style="padding-top: 0">
+               <h1 class="head__title">Orders</h1>
+               <p class="head__sub">
+                  Track fulfilment and update the status of every order.
+               </p>
             </div>
-            <ul class="list-unstyled">
-               <li><a href="./dashboard.html">Dashboard</a></li>
-               <li><a href="./viewCustommerce.html">Customers</a></li>
-               <li><a href="./add-products.html">Add Products</a></li>
-               <li><a href="./adminProductList.html">Manage Products</a></li>
-               <li><a href="./orders.html">Orders</a></li>
-               <li><a href="./adminReviews.html">Reviews</a></li>
-               <li><a href="./adminPaymentHistory.html">Payments</a></li>
-               <li><a class="text-danger" href="./logout.html">Log Out</a></li>
-            </ul>
-         </div>
 
-         <div class="container">
-            <h2>Manage Orders</h2>
-            <input
-               id="searchOrder"
-               type="text"
-               class="search-bar"
-               placeholder="Search orders..."
-               onkeypress="handleKeyPress(event)"
-            />
-            <button id="searchOrderButton" type="submit">Search</button>
+            <div class="bar" style="margin-top: 24px">
+               <div class="chips" id="statusChips" role="group" aria-label="Filter by status">
+                  <button class="chip" type="button" data-status="all" aria-pressed="true">
+                     All <span id="allCount">0</span>
+                  </button>
+                  <button class="chip" type="button" data-status="pending" aria-pressed="false">
+                     Pending <span id="pendingCount">0</span>
+                  </button>
+                  <button class="chip" type="button" data-status="processing" aria-pressed="false">
+                     Processing <span id="processingCount">0</span>
+                  </button>
+                  <button class="chip" type="button" data-status="shipped" aria-pressed="false">
+                     Shipped <span id="shippedCount">0</span>
+                  </button>
+                  <button class="chip" type="button" data-status="delivered" aria-pressed="false">
+                     Delivered <span id="deliveredCount">0</span>
+                  </button>
+                  <button class="chip" type="button" data-status="canceled" aria-pressed="false">
+                     Canceled <span id="canceledCount">0</span>
+                  </button>
+               </div>
+               <div class="bar__right">
+                  <div class="search" style="max-width: 280px">
+                     <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        aria-hidden="true"
+                     >
+                        <circle cx="11" cy="11" r="6.5" />
+                        <path d="m16 16 4.5 4.5" />
+                     </svg>
+                     <input
+                        id="searchOrder"
+                        type="search"
+                        placeholder="Search by customer or ID"
+                        aria-label="Search orders"
+                     />
+                  </div>
+               </div>
+            </div>
 
-            <button
-               style="
-                  background-color: rgb(229, 222, 83);
-                  border-radius: 10px;
-                  color: black;
-                  font-weight: bolder;
-                  margin-top: 5px;
-                  margin-bottom: 10px;
-                  height: 5%;
-                  width: 15%;
-                  padding: 10px;
-                  border: none;
-               "
-               onclick="location.reload()"
-            >
-               All &nbsp; &nbsp; <span id="allCount">0</span>
-            </button>
-            <button
-               id="pending"
-               style="
-                  height: 5%;
-                  background-color: aqua;
-                  border-radius: 10px;
-                  color: black;
-                  font-weight: bolder;
-                  margin-top: 5px;
-                  margin-bottom: 10px;
-                  height: 5%;
-                  width: 15%;
-                  padding: 10px;
-                  border: none;
-               "
-            >
-               Pending &nbsp; &nbsp; <span id="pendingCount">0</span>
-            </button>
-
-            <button
-               id="processing"
-               style="
-                  height: 5%;
-                  background-color: aqua;
-                  border-radius: 10px;
-                  color: black;
-                  font-weight: bolder;
-                  margin-top: 5px;
-                  margin-bottom: 10px;
-                  height: 5%;
-                  width: 15%;
-                  padding: 10px;
-                  border: none;
-               "
-            >
-               Processing &nbsp; &nbsp; <span id="processingCount">0</span>
-            </button>
-            <button
-               id="shipped"
-               style="
-                  height: 5%;
-                  background-color: aqua;
-                  border-radius: 10px;
-                  color: black;
-                  font-weight: bolder;
-                  margin-top: 5px;
-                  margin-bottom: 10px;
-                  height: 5%;
-                  width: 15%;
-                  padding: 10px;
-                  border: none;
-               "
-            >
-               Shipped &nbsp; &nbsp; <span id="shippedCount">0</span>
-            </button>
-            <button
-               id="canceled"
-               style="
-                  height: 5%;
-                  background-color: aqua;
-                  border-radius: 10px;
-                  color: black;
-                  font-weight: bolder;
-                  margin-top: 5px;
-                  margin-bottom: 10px;
-                  height: 5%;
-                  width: 15%;
-                  padding: 10px;
-                  border: none;
-               "
-            >
-               Canceled &nbsp; &nbsp; <span id="canceledCount">0</span>
-            </button>
-            <button
-               id="delivered"
-               style="
-                  height: 5%;
-                  background-color: aqua;
-                  border-radius: 10px;
-                  color: black;
-                  font-weight: bolder;
-                  margin-top: 5px;
-                  margin-bottom: 10px;
-                  height: 5%;
-                  width: 15%;
-                  padding: 10px;
-                  border: none;
-               "
-            >
-               Delivered &nbsp; &nbsp; <span id="deliveredCount">0</span>
-            </button>
-
-            <div id="editOrderContainer" style="display: none"></div>
-
-            <table>
-               <thead>
-                  <tr>
-                     <th>Order ID</th>
-                     <th>Customer</th>
-                     <th>Product Name</th>
-                     <th>Image</th>
-                     <th>Date</th>
-                     <th>Total</th>
-                     <th>Payment Status</th>
-                     <th>Order Status</th>
-                     <th>Actions</th>
-                  </tr>
-               </thead>
-               <tbody id="orderTable">
-                  <tr>
-                     <td>#1001</td>
-                     <td>John Doe</td>
-                     <td>Shofa set</td>
-                     <td>Image</td>
-                     <td>2025-02-21</td>
-                     <td>$ 150.00</td>
-                     <td>Paid</td>
-                     <td>Pending</td>
-                     <td>
-                        <button class="btn btn-edit">Edit</button>
-                        <button class="btn btn-delete">Delete</button>
-                     </td>
-                  </tr>
-               </tbody>
-            </table>
-         </div>
+            <div class="table-wrap">
+               <table class="table">
+                  <thead>
+                     <tr>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                     </tr>
+                  </thead>
+                  <tbody id="orderTable">
+                     <tr>
+                        <td class="table__empty" colspan="8">Loading orders…</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </main>
       </div>
 
+      <script src="./static/js/coman/nav.js"></script>
+      <script src="./static/js/coman/toast.js"></script>
       <script src="./static/js/coman/currentUser.js"></script>
+      <script src="./static/js/coman/adminShell.js"></script>
       <script src="./static/js/orders/getOrders.js"></script>
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
    </body>
 </html>

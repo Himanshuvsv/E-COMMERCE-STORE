@@ -1,123 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Signup - SHOPEASE</title>
-      <link rel="stylesheet" href="./static/css/user/register.css" />
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Create account — ShopEase</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap"
+         rel="stylesheet"
+      />
+      <link rel="stylesheet" href="./static/css/theme.css" />
    </head>
-   <body>
-      <div class="container">
-         <div class="header">
-            <img src="./logo.jpeg" alt="Logo" />
-            <h1 class="sitename">SHOPEASE</h1>
-         </div>
-         <form id="signupForm">
-            <div class="form-group">
-               <label for="name">Name</label>
-               <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  placeholder="Enter your name"
-                  required
-               />
-            </div>
-            <div class="form-group">
-               <label for="email">Email</label>
-               <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="Enter your email"
-                  required
-               />
-            </div>
-            <div class="form-group">
-               <label for="password">Password</label>
-               <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  placeholder="Enter your password"
-                  required
-               />
-            </div>
-            <div class="form-group">
-               <label for="confirmpassword">Confirm Password</label>
-               <input
-                  type="password"
-                  id="confirmpassword"
-                  name="confirmpassword"
-                  placeholder="Confirm your password"
-                  required
-               />
-            </div>
-            <button type="submit" class="btn">Signup</button>
-            <li>
-               <a href="./login.html" id="login-link"
-                  >all ready have an acount ...Login here</a
-               >
-            </li>
-         </form>
-         <div class="footer">
-            <p>&copy; 2025 SHOPEASE. All rights reserved.</p>
-         </div>
-      </div>
-      <script>
-         document.addEventListener("DOMContentLoaded", () => {
-            const signupForm = document.getElementById("signupForm");
 
-            signupForm.addEventListener("submit", async (event) => {
+   <body>
+      <main class="centered">
+         <div class="auth-card">
+            <a class="auth-card__brand" href="./index.html">
+               <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  width="26"
+                  height="26"
+                  aria-hidden="true"
+                  style="color: var(--accent)"
+               >
+                  <path
+                     d="M4 8h16l-1.3 11.2a1.5 1.5 0 0 1-1.5 1.3H6.8a1.5 1.5 0 0 1-1.5-1.3z"
+                  />
+                  <path d="M8.6 8V6.3a3.4 3.4 0 0 1 6.8 0V8" />
+               </svg>
+               <span class="brand__name">ShopEase</span>
+            </a>
+
+            <h1>Create your account</h1>
+            <p class="auth-card__sub">
+               Save a wishlist, track orders and check out faster.
+            </p>
+
+            <form id="signupForm" class="auth-form">
+               <div class="field">
+                  <label for="name">Name</label>
+                  <input
+                     type="text"
+                     id="name"
+                     name="name"
+                     placeholder="Your full name"
+                     autocomplete="name"
+                     required
+                  />
+               </div>
+               <div class="field">
+                  <label for="email">Email</label>
+                  <input
+                     type="email"
+                     id="email"
+                     name="email"
+                     placeholder="you@example.com"
+                     autocomplete="email"
+                     required
+                  />
+               </div>
+               <div class="field">
+                  <label for="password">Password</label>
+                  <input
+                     type="password"
+                     id="password"
+                     name="password"
+                     placeholder="At least 6 characters"
+                     autocomplete="new-password"
+                     minlength="6"
+                     required
+                  />
+               </div>
+               <div class="field">
+                  <label for="confirmpassword">Confirm password</label>
+                  <input
+                     type="password"
+                     id="confirmpassword"
+                     name="confirmpassword"
+                     placeholder="Repeat your password"
+                     autocomplete="new-password"
+                     required
+                  />
+               </div>
+               <button class="btn btn--block" type="submit">
+                  Create account
+               </button>
+            </form>
+
+            <p class="auth-card__foot">
+               Already have an account? <a href="./login.html">Sign in</a>
+            </p>
+         </div>
+      </main>
+
+      <script src="./static/js/coman/toast.js"></script>
+      <script>
+         document
+            .getElementById("signupForm")
+            .addEventListener("submit", async (event) => {
                event.preventDefault();
 
+               const submit = event.target.querySelector(
+                  'button[type="submit"]'
+               );
                const name = document.getElementById("name").value;
                const email = document.getElementById("email").value;
                const password = document.getElementById("password").value;
                const confirmPassword =
                   document.getElementById("confirmpassword").value;
+
                if (password !== confirmPassword) {
-                  alert("Passwords do not match. Please try again.");
+                  toastError("Those passwords do not match");
                   return;
                }
 
+               submit.disabled = true;
+               submit.classList.add("is-busy");
+
                try {
-                  const response = await fetch(
-                     "http://127.0.0.1:5000/api/auth/register",
-                     {
-                        method: "POST",
-                        headers: {
-                           "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ name, email, password }),
-                     }
-                  );
+                  const response = await fetch("/api/auth/register", {
+                     method: "POST",
+                     headers: { "Content-Type": "application/json" },
+                     credentials: "include",
+                     body: JSON.stringify({ name, email, password }),
+                  });
+
                   if (response.ok) {
-                     const data = await response.json();
-                     alert(
-                        "Registration successful! Welcome, " + data.user.name
-                     );
+                     toast("Account created");
                      window.location.href = "login.html";
-                  } else {
-                     const errorText = await response.text();
-                     try {
-                        const errorData = JSON.parse(errorText);
-                        alert(`Error: ${errorData["msg"]}`);
-                     } catch (e) {
-                        alert(
-                           `Error: ${
-                              errorText || "An unexpected error occurred"
-                           }`
-                        );
-                     }
+                     return;
+                  }
+
+                  const errorText = await response.text();
+                  submit.disabled = false;
+                  submit.classList.remove("is-busy");
+
+                  try {
+                     toastError(
+                        JSON.parse(errorText).msg || "Could not register"
+                     );
+                  } catch (parseError) {
+                     toastError(errorText || "Could not register");
                   }
                } catch (error) {
-                  alert(
-                     "An unexpected error occurred. Please try again later."
-                  );
+                  submit.disabled = false;
+                  submit.classList.remove("is-busy");
+                  toastError("Something went wrong. Please try again.");
                }
             });
-         });
       </script>
    </body>
 </html>

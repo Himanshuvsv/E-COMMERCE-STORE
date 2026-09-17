@@ -1,45 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Secure Payment</title>
-      <script src="https://js.stripe.com/v3/"></script>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Checkout — ShopEase</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap"
+         rel="stylesheet"
+      />
+      <link rel="stylesheet" href="./static/css/theme.css" />
       <link rel="stylesheet" href="./static/css/user/payment.css" />
+      <script src="https://js.stripe.com/v3/"></script>
    </head>
+
    <body>
-      <div class="container">
-         <div class="cart-container">
-            <h2>Product Details</h2>
-            <div class="product-details"></div>
+      <header class="top">
+         <div class="wrap top__row">
+            <a class="brand" href="./index2.html">
+               <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+               >
+                  <path
+                     d="M4 8h16l-1.3 11.2a1.5 1.5 0 0 1-1.5 1.3H6.8a1.5 1.5 0 0 1-1.5-1.3z"
+                  />
+                  <path d="M8.6 8V6.3a3.4 3.4 0 0 1 6.8 0V8" />
+               </svg>
+               <span class="brand__name">ShopEase</span>
+            </a>
+            <span class="badge badge--ok nowrap" style="margin-left: auto"
+               >Secure checkout</span
+            >
+         </div>
+      </header>
 
-            <div class="price-details">
-               <h2>Price Details</h2>
-               <p>Subtotal: <span id="subtotal">₹0</span></p>
-               <p>Shipping Fee: <span id="shipping">₹50</span></p>
-               <hr />
-               <p class="order-total">
-                  Order Total: <span id="total">₹0</span>
+      <main class="wrap page">
+         <div class="head">
+            <h1 class="head__title">Checkout</h1>
+            <p class="head__sub">
+               Your card details are handled directly by Stripe.
+            </p>
+         </div>
+
+         <div class="checkout-layout">
+            <section class="card" style="order: 2">
+               <div class="card__head">
+                  <div>
+                     <h2 class="card__title">Payment</h2>
+                     <p class="card__sub">Card or debit card</p>
+                  </div>
+               </div>
+
+               <div class="field">
+                  <label for="card-element">Card details</label>
+                  <div id="card-element" class="card-element"></div>
+                  <span class="field__hint" id="error-message"></span>
+               </div>
+
+               <button class="btn btn--block" id="submit-button" type="button" style="margin-top: 18px">
+                  Pay now
+               </button>
+
+               <p class="muted" style="font-size: 12.5px; margin: 14px 0 0">
+                  You can cancel an order and request a refund from the orders
+                  page.
                </p>
-            </div>
-         </div>
-         <div class="payment-container">
-            <h2>Secure Payment</h2>
-            <div class="form-group">
-               <label for="card-element">Card Details</label>
-               <div id="card-element" class="card-element"></div>
-            </div>
-            <button id="submit-button">Pay Now</button>
-            <div class="error-message" id="error-message"></div>
-         </div>
-      </div>
+            </section>
 
+            <aside class="stack" style="order: 1">
+               <div class="card">
+                  <div class="card__head">
+                     <div>
+                        <h2 class="card__title">Order summary</h2>
+                        <p class="card__sub">Items in this order</p>
+                     </div>
+                  </div>
+                  <div class="product-details" id="product-details"></div>
+                  <div class="rows" style="margin-top: 16px">
+                     <div class="row">
+                        <span class="row__key">Subtotal</span>
+                        <span class="row__val" id="subtotal">₹0</span>
+                     </div>
+                     <div class="row">
+                        <span class="row__key">Shipping</span>
+                        <span class="row__val" id="shipping">₹50</span>
+                     </div>
+                     <div class="row">
+                        <span class="row__key">Total</span>
+                        <span class="row__val price" id="total">₹0</span>
+                     </div>
+                  </div>
+               </div>
+
+               <a class="btn btn--ghost" href="./cart.html">Back to cart</a>
+            </aside>
+         </div>
+      </main>
+
+      <script src="./static/js/coman/toast.js"></script>
       <script>
          const stripe = Stripe(
             "pk_test_51QuTIE2UJMTuoy4fzrsCrPeMWS956B3bQD4XR6UJKAOIz3toz6fxCJzlwjyXJYkkIvE86KzwBNyXhYN8ICFdBioC00ipeLKcRt"
          );
-         const elements = stripe.elements();
-         const card = elements.create("card");
+         const elements = stripe.elements({
+            fonts: [
+               {
+                  cssSrc:
+                     "https://fonts.googleapis.com/css2?family=Archivo:wght@400;600&display=swap",
+               },
+            ],
+         });
+         const card = elements.create("card", {
+            style: {
+               base: {
+                  fontFamily: "Archivo, Helvetica Neue, Arial, sans-serif",
+                  fontSize: "16px",
+                  color: "#151A16",
+                  "::placeholder": { color: "#9AA39B" },
+               },
+               invalid: { color: "#B3261E" },
+            },
+         });
          card.mount("#card-element");
 
          const submitButton = document.getElementById("submit-button");
@@ -49,53 +137,52 @@
 
          async function fetchCartItems() {
             try {
-               const response = await fetch("http://127.0.0.1:5000/api/cart", {
+               const response = await fetch("/api/cart", {
                   method: "GET",
                   credentials: "include",
                });
 
-               if (!response.ok) {
-                  throw new Error("Failed to fetch cart items");
-               }
+               if (!response.ok) throw new Error("Failed to fetch cart items");
 
                cartItems = await response.json();
-               const productDetailsContainer =
-                  document.querySelector(".product-details");
-               productDetailsContainer.innerHTML = "";
-
+               const container = document.getElementById("product-details");
                let subtotal = 0;
-               cartItems.forEach((item) => {
-                  subtotal += item.price * item.quantity;
-                  const productCard = `
-                    <div class="product-card">
-                        <img src="http://127.0.0.1:5000/${item.image}" alt="${item.name}" />
-                        <div class="product-info">
-                            <h3>${item.name}</h3>
-                            <p>Category: ${item.category}</p>
-                            <p>Quantity: ${item.quantity}</p>
-                            <p class="price">₹${item.price}</p>
-                            <a href="#" class="remove" data-id="${item._id}">✖ REMOVE</a>
-                        </div>
-                    </div>
-                  `;
-                  productDetailsContainer.innerHTML += productCard;
-               });
+
+               container.innerHTML = cartItems
+                  .map((item) => {
+                     subtotal += item.price * item.quantity;
+                     return `
+                  <div class="summary-item">
+                     <img src="${item.image}" alt="${item.name}">
+                     <div>
+                        <p class="summary-item__name">${item.name}</p>
+                        <p class="summary-item__meta">${item.category} · Qty ${item.quantity}</p>
+                     </div>
+                     <span class="summary-item__price">₹${
+                        item.price * item.quantity
+                     }</span>
+                  </div>`;
+                  })
+                  .join("");
 
                const shippingFee = 50;
-               const total = subtotal + shippingFee;
-
                document.getElementById("subtotal").textContent = `₹${subtotal}`;
                document.getElementById(
                   "shipping"
                ).textContent = `₹${shippingFee}`;
-               document.getElementById("total").textContent = `₹${total}`;
+               document.getElementById("total").textContent = `₹${
+                  subtotal + shippingFee
+               }`;
             } catch (error) {
-               alert("error : ", error.message);
+               toastError("Could not load your cart");
             }
          }
+
          fetchCartItems();
+
          submitButton.addEventListener("click", async () => {
             submitButton.disabled = true;
+            submitButton.classList.add("is-busy");
             errorMessage.textContent = "";
 
             const { paymentMethod, error } = await stripe.createPaymentMethod({
@@ -103,29 +190,30 @@
                card: card,
             });
 
-            if (error) {
-               errorMessage.textContent = error.message;
+            function fail(message) {
+               errorMessage.textContent = message;
+               errorMessage.style.color = "var(--danger)";
                submitButton.disabled = false;
-               return;
+               submitButton.classList.remove("is-busy");
             }
 
+            if (error) return fail(error.message);
             if (!paymentMethod || !paymentMethod.id) {
-               errorMessage.textContent = "Failed to create payment method.";
-               submitButton.disabled = false;
-               return;
+               return fail("Could not read those card details.");
             }
 
             try {
-               const totalText = document
-                  .getElementById("total")
-                  .textContent.replace("₹", "")
-                  .trim();
-               const totalAmount = parseInt(totalText, 10) * 100;
-
-               console.log("Total Amount:", totalAmount);
+               const totalAmount =
+                  parseInt(
+                     document
+                        .getElementById("total")
+                        .textContent.replace("₹", "")
+                        .trim(),
+                     10
+                  ) * 100;
 
                const paymentResponse = await fetch(
-                  "http://127.0.0.1:5000/api/payment/create-payment-intent",
+                  "/api/payment/create-payment-intent",
                   {
                      method: "POST",
                      credentials: "include",
@@ -138,36 +226,25 @@
                   }
                );
 
-               let paymentData;
-               try {
-                  paymentData = await paymentResponse.json();
-               } catch (error) {
-                  throw new Error("Invalid response from server.");
-               }
-
-               console.log("Payment Response:", paymentData);
+               const paymentData = await paymentResponse.json();
 
                if (!paymentResponse.ok || paymentData.status !== "succeeded") {
                   throw new Error(paymentData.message || "Payment failed");
                }
-               const orderResponse = await fetch(
-                  "http://127.0.0.1:5000/api/orders",
-                  {
-                     method: "POST",
-                     credentials: "include",
-                     headers: { "Content-Type": "application/json" },
-                     body: JSON.stringify({ cartItems }),
-                  }
-               );
 
-               if (!orderResponse.ok) {
-                  throw new Error("Order placement failed");
-               }
+               const orderResponse = await fetch("/api/orders", {
+                  method: "POST",
+                  credentials: "include",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ cartItems }),
+               });
+
+               if (!orderResponse.ok) throw new Error("Order placement failed");
 
                const orderData = await orderResponse.json();
-               const orderId = orderData.order._id;
-               const updatePaymentResponse = await fetch(
-                  `http://127.0.0.1:5000/api/orders/${orderId}`,
+
+               const updateResponse = await fetch(
+                  `/api/orders/${orderData.order._id}`,
                   {
                      method: "PATCH",
                      credentials: "include",
@@ -179,19 +256,18 @@
                   }
                );
 
-               if (!updatePaymentResponse.ok) {
+               if (!updateResponse.ok) {
                   throw new Error("Failed to update payment status");
                }
 
-               await fetch("http://127.0.0.1:5000/api/cart", {
+               await fetch("/api/cart", {
                   method: "DELETE",
                   credentials: "include",
                });
+
                window.location.href = "success.html";
             } catch (error) {
-               errorMessage.textContent =
-                  error.message || "Payment request failed.";
-               submitButton.disabled = false;
+               fail(error.message || "Payment request failed.");
             }
          });
       </script>

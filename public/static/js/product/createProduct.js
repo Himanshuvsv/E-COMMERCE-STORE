@@ -1,20 +1,17 @@
 const form = document.getElementById("addProductForm");
 
-form.addEventListener("submit", async (e) => {
-   e.preventDefault();
+form.addEventListener("submit", async (event) => {
+   event.preventDefault();
 
+   const submit = form.querySelector('button[type="submit"]');
    const formData = new FormData();
 
-   // Get form data
    formData.append("name", document.getElementById("name").value);
    formData.append("price", document.getElementById("price").value);
    formData.append("description", document.getElementById("description").value);
    formData.append("category", document.getElementById("category").value);
    formData.append("company", document.getElementById("company").value);
-   formData.append(
-      "colors",
-      document.getElementById("colors").value.split(",")
-   );
+   formData.append("colors", document.getElementById("colors").value.split(","));
    formData.append("inventory", document.getElementById("inventory").value);
    formData.append("featured", document.getElementById("featured").checked);
    formData.append(
@@ -22,14 +19,14 @@ form.addEventListener("submit", async (e) => {
       document.getElementById("freeShipping").checked
    );
 
-   // Handle image upload
    const imageInput = document.getElementById("image");
-   if (imageInput.files[0]) {
-      formData.append("image", imageInput.files[0]);
-   }
+   if (imageInput.files[0]) formData.append("image", imageInput.files[0]);
+
+   submit.disabled = true;
+   submit.classList.add("is-busy");
 
    try {
-      const response = await fetch("http://127.0.0.1:5000/api/products", {
+      const response = await fetch("/api/products", {
          method: "POST",
          body: formData,
          credentials: "include",
@@ -38,13 +35,15 @@ form.addEventListener("submit", async (e) => {
       const data = await response.json();
 
       if (response.ok) {
-         alert("Product added successfully!");
          form.reset();
+         toast("Product added");
       } else {
-         alert(data.error);
+         toastError(data.error || data.msg || "Could not add the product");
       }
    } catch (error) {
-      console.error(error);
-      alert("Error: " + error.message);
+      toastError("Could not add the product");
+   } finally {
+      submit.disabled = false;
+      submit.classList.remove("is-busy");
    }
 });

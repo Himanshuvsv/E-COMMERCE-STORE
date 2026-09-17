@@ -1,47 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Your Orders</title>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Orders — ShopEase</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap"
+         rel="stylesheet"
+      />
+      <link rel="stylesheet" href="./static/css/theme.css" />
       <link rel="stylesheet" href="./static/css/user/order.css" />
-      <link rel="stylesheet" href="./static/css/user/main.css" />
-      <link rel="stylesheet" href="./static/css/user/reviews.css" />
-
-      <style>
-         
-      </style>
    </head>
-   <body class="index-page">
-      <div
-         id="navbar-container"
-         class="header d-flex align-items-center fixed-top"
-      ></div>
-      <div class="container">
-         <h1>Your Orders</h1>
-         <h2 id="total-orders">Total Orders: 0</h2>
 
-         <div class="tabs">
-            <button class="active">Orders</button>
-         </div>
-         <div class="search-orders">
-            <input type="text" placeholder="Search all orders" />
-            <button>Search Orders</button>
+   <body>
+      <div id="navbar-container" data-src="navbar.html"></div>
+
+      <main class="wrap page">
+         <div class="head">
+            <h1 class="head__title">Your orders</h1>
+            <p class="head__sub">
+               Track what you ordered, cancel an order or leave a review.
+            </p>
          </div>
 
-         <div id="orders-container"></div>
-      </div>
+         <div class="bar">
+            <span class="resultcount" id="total-orders">0 orders</span>
+            <div class="bar__right">
+               <div class="search" style="max-width: 280px">
+                  <svg
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     aria-hidden="true"
+                  >
+                     <circle cx="11" cy="11" r="6.5" />
+                     <path d="m16 16 4.5 4.5" />
+                  </svg>
+                  <input
+                     id="orderSearch"
+                     type="search"
+                     placeholder="Search your orders"
+                     aria-label="Search your orders"
+                  />
+               </div>
+            </div>
+         </div>
+
+         <div class="stack" id="orders-container"></div>
+      </main>
 
       <div id="footer-placeholder"></div>
-      <script>
-         fetch("footer.html")
-            .then((response) => response.text())
-            .then((data) => {
-               document.getElementById("footer-placeholder").innerHTML = data;
-            })
-            .catch((error) => console.log("error loading footer", error));
-      </script>
-      <script src="./static/js/users/viewOrders.js"></script>
+
+      <script src="./static/js/coman/nav.js"></script>
+      <script src="./static/js/coman/toast.js"></script>
       <script src="./static/js/coman/currentUser.js"></script>
+      <script src="./static/js/coman/shell.js"></script>
+      <script src="./static/js/users/viewOrders.js"></script>
    </body>
 </html>

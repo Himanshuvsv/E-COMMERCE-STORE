@@ -1,115 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>About Us - ShopEase</title>
-      <link rel="stylesheet" href="./static/css/user/contact.css" />
-      <link rel="stylesheet" href="./static/css/user/about.css" />
-      <link rel="stylesheet" href="./static/css/user/main.css" />
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>About — ShopEase</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap"
+         rel="stylesheet"
+      />
+      <link rel="stylesheet" href="./static/css/theme.css" />
    </head>
+
    <body>
-      <div
-         id="navbar-container"
-         class="header d-flex align-items-center fixed-top"
-      ></div>
+      <div id="navbar-container" data-src="guestNav.html"></div>
 
-      <script>
-         async function loadNavbar() {
-            try {
-               const response = await fetch("guestNav.html");
-               const navbarHTML = await response.text();
-               document.getElementById("navbar-container").innerHTML =
-                  navbarHTML;
+      <main class="wrap page">
+         <div class="head">
+            <h1 class="head__title">About ShopEase</h1>
+            <p class="head__sub">
+               We make solid wood furniture for the home office and dining room,
+               and we sell it without the showroom markup.
+            </p>
+         </div>
 
-               // Call fetchUser() AFTER navbar is loaded
-               fetchUser();
-            } catch (error) {
-               console.error("Error loading navbar:", error);
-            }
-         }
-         loadNavbar();
-         window.onclick = function (event) {
-            const modal = document.getElementById("edit-profile-modal");
-            if (event.target === modal) {
-               modal.style.display = "none";
-            }
-         };
-      </script>
-      <div class="about-header">
-         <h1>About ShopEase</h1>
-      </div>
+         <div class="split" style="margin-top: 28px">
+            <div class="stack">
+               <div class="card prose">
+                  <h2>What we do</h2>
+                  <p>
+                     Every piece we stock is built to be used daily: desks that
+                     hold a full setup, chairs that stay comfortable through a
+                     working day, and dining tables that take a family through a
+                     decade of meals.
+                  </p>
+                  <p>
+                     We work directly with a small set of makers, which keeps the
+                     range tight and the quality consistent.
+                  </p>
+               </div>
 
-      <div class="about-content">
-         <p>
-            Welcome to <strong>ShopEase</strong>, your one-stop online shopping
-            destination! At ShopEase, we strive to bring you a seamless and
-            hassle-free shopping experience with a wide range of products across
-            various categories.
-         </p>
+               <div class="card prose">
+                  <h2>Why choose us</h2>
+                  <ul>
+                     <li>A curated range instead of an endless catalogue</li>
+                     <li>Secure and seamless payment options</li>
+                     <li>Fast, tracked delivery</li>
+                     <li>Free returns within 30 days</li>
+                     <li>Support that replies within a business day</li>
+                  </ul>
+               </div>
+            </div>
 
-         <h2>Why Choose ShopEase?</h2>
-         <ul>
-            <li>✔ A vast collection of products from trusted brands</li>
-            <li>✔ Secure and seamless payment options</li>
-            <li>✔ Fast and reliable delivery services</li>
-            <li>✔ Easy returns and customer-friendly policies</li>
-            <li>✔ 24/7 customer support to assist you</li>
-         </ul>
+            <div class="stack">
+               <div class="card prose">
+                  <h2>Contact us</h2>
+                  <div class="rows">
+                     <div class="row">
+                        <span class="row__key">Email</span>
+                        <span class="row__val">
+                           <a href="mailto:support@shopease.com"
+                              >support@shopease.com</a
+                           >
+                        </span>
+                     </div>
+                     <div class="row">
+                        <span class="row__key">Phone</span>
+                        <span class="row__val">+1 234 567 890</span>
+                     </div>
+                     <div class="row">
+                        <span class="row__key">Address</span>
+                        <span class="row__val"
+                           >123 E-Commerce Street<br />ShopEase City, SE
+                           45678</span
+                        >
+                     </div>
+                  </div>
+               </div>
 
-         <h2>Our E-Commerce Features</h2>
-         <ul>
-            <li>
-               <strong>Product Categories:</strong> Electronics, Fashion, Home &
-               Kitchen, Beauty & Health, and more.
-            </li>
-            <li>
-               <strong>User-Friendly Interface:</strong> Easy navigation and a
-               simple shopping cart system.
-            </li>
-            <li>
-               <strong>Secure Payments:</strong> Multiple payment options,
-               including credit/debit cards, UPI, and cash on delivery.
-            </li>
-            <li>
-               <strong>Order Tracking:</strong> Real-time order tracking and
-               notifications.
-            </li>
-            <li>
-               <strong>Wishlist & Favorites:</strong> Save your favorite
-               products for future purchases.
-            </li>
-            <li>
-               <strong>Exclusive Deals & Discounts:</strong> Exciting offers and
-               seasonal discounts.
-            </li>
-         </ul>
-      </div>
-
-      <div class="contact-us">
-         <h2>Contact Us</h2>
-         <p>
-            If you have any questions, feedback, or need assistance, feel free
-            to reach out to us:
-         </p>
-         <ul>
-            <li><strong>Email:</strong> support@shopease.com</li>
-            <li><strong>Phone:</strong> +1 234 567 890</li>
-            <li>
-               <strong>Address:</strong> 123 E-Commerce Street, ShopEase City,
-               SE 45678
-            </li>
-         </ul>
-      </div>
+               <div class="card">
+                  <h2 class="card__title" style="margin-bottom: 6px">
+                     Ready to browse?
+                  </h2>
+                  <p class="card__sub" style="margin-bottom: 16px">
+                     Create an account to save a wishlist and track orders.
+                  </p>
+                  <div class="actions">
+                     <a class="btn" href="./register.html">Create account</a>
+                     <a class="btn btn--ghost" href="./index.html"
+                        >See products</a
+                     >
+                  </div>
+               </div>
+            </div>
+         </div>
+      </main>
 
       <div id="footer-placeholder"></div>
-      <script>
-         fetch("footer.html")
-            .then((response) => response.text())
-            .then((data) => {
-               document.getElementById("footer-placeholder").innerHTML = data;
-            })
-            .catch((error) => console.log("Error loading footer", error));
-      </script>
+
+      <script src="./static/js/coman/nav.js"></script>
+      <script src="./static/js/coman/toast.js"></script>
+      <script src="./static/js/coman/shell.js"></script>
    </body>
 </html>

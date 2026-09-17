@@ -1,132 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Payment History</title>
-      <link rel="stylesheet" href="./static/css/user/paymentHistory.css" />
-      <link rel="stylesheet" href="./static/css/user/main.css">
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Payment history — ShopEase</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap"
+         rel="stylesheet"
+      />
+      <link rel="stylesheet" href="./static/css/theme.css" />
    </head>
-   <body>
-      <div
-         id="navbar-container"
-         class="header d-flex align-items-center fixed-top"
-      ></div>
-      <div class="container">
-         <h2>Transactions</h2>
-         <div class="filters">
-            <button id="allBtn" class="active">All <strong> 0</strong></button>
-            <button id="succeededBtn">Succeeded  <strong> 0</strong></button>
-            <button id="refundedBtn">Refunded  <strong> 0</strong></button>
-            <button id="disputedBtn">Disputed <strong> 0</strong></button>
-            <button id="failedBtn">Failed <strong> 0</strong></button>
-         </div>
-         <table>
-            <thead>
-               <tr>
-                  <th>Amount</th>
-                  <th>Currency</th>
-                  <th>Status</th>
-                  <th>Payment Method</th>
-                  <th>Description</th>
-                  <th>Customer</th>
-                  <th>Date</th>
-                  <th>Refunded Date</th>
-               </tr>
-            </thead>
-            <tbody id="paymentTableBody">
-               <tr>
-                  <td colspan="8" style="text-align: center">Loading...</td>
-               </tr>
-            </tbody>
-         </table>
-      </div>
-      <div id="footer-placeholder"></div>
-      <script>
-         async function loadNavbar() {
-            try {
-               const response = await fetch("navbar.html");
-               const navbarHTML = await response.text();
-               document.getElementById("navbar-container").innerHTML =
-                  navbarHTML;
-            } catch (error) {
-               console.error("Error loading navbar:", error);
-            }
-         }
-         loadNavbar();
 
-         fetch("footer.html")
-            .then((response) => response.text())
-            .then((data) => {
-               document.getElementById("footer-placeholder").innerHTML = data;
-            })
-            .catch((error) => console.log("error loading footer", error));
+   <body>
+      <div id="navbar-container" data-src="navbar.html"></div>
+
+      <main class="wrap page">
+         <div class="head">
+            <h1 class="head__title">Payment history</h1>
+            <p class="head__sub">
+               Every transaction on your account, including refunds.
+            </p>
+         </div>
+
+         <div class="bar">
+            <div class="chips" id="paymentChips" role="group" aria-label="Filter by status">
+               <button class="chip" type="button" data-status="" aria-pressed="true">
+                  All <span id="allCount">0</span>
+               </button>
+               <button class="chip" type="button" data-status="succeeded" aria-pressed="false">
+                  Succeeded <span id="succeededCount">0</span>
+               </button>
+               <button class="chip" type="button" data-status="refunded" aria-pressed="false">
+                  Refunded <span id="refundedCount">0</span>
+               </button>
+               <button class="chip" type="button" data-status="disputed" aria-pressed="false">
+                  Disputed <span id="disputedCount">0</span>
+               </button>
+               <button class="chip" type="button" data-status="failed" aria-pressed="false">
+                  Failed <span id="failedCount">0</span>
+               </button>
+            </div>
+         </div>
+
+         <div class="table-wrap">
+            <table class="table">
+               <thead>
+                  <tr>
+                     <th>Amount</th>
+                     <th>Status</th>
+                     <th>Method</th>
+                     <th>Description</th>
+                     <th>Date</th>
+                     <th>Refunded</th>
+                  </tr>
+               </thead>
+               <tbody id="paymentTableBody">
+                  <tr>
+                     <td class="table__empty" colspan="6">Loading transactions…</td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+      </main>
+
+      <div id="footer-placeholder"></div>
+
+      <script src="./static/js/coman/nav.js"></script>
+      <script src="./static/js/coman/toast.js"></script>
+      <script src="./static/js/coman/currentUser.js"></script>
+      <script src="./static/js/coman/shell.js"></script>
+      <script>
+         const statusTone = {
+            succeeded: "badge--ok",
+            refunded: "badge--warn",
+            disputed: "badge--warn",
+            failed: "badge--danger",
+         };
+
+         let allPayments = [];
+         let paymentFilter = "";
+
+         function renderPayments() {
+            const body = document.getElementById("paymentTableBody");
+            const rows = paymentFilter
+               ? allPayments.filter((item) => item.status === paymentFilter)
+               : allPayments;
+
+            if (!rows.length) {
+               body.innerHTML =
+                  '<tr><td class="table__empty" colspan="6">No transactions to show.</td></tr>';
+               return;
+            }
+
+            body.innerHTML = rows
+               .map((payment) => {
+                  const amount = payment.amount
+                     ? "₹" + (payment.amount / 100).toFixed(2)
+                     : "—";
+                  const status = payment.status || "unknown";
+
+                  return `
+               <tr>
+                  <td data-label="Amount"><strong style="color:var(--ink)">${amount}</strong></td>
+                  <td data-label="Status">
+                     <span class="badge ${statusTone[status] || ""}">${
+                     status.charAt(0).toUpperCase() + status.slice(1)
+                  }</span>
+                  </td>
+                  <td data-label="Method">${payment.paymentMethod || "Card"}</td>
+                  <td data-label="Description">${payment.description || "—"}</td>
+                  <td data-label="Date">${
+                     payment.date ? new Date(payment.date).toLocaleString() : "—"
+                  }</td>
+                  <td data-label="Refunded">${
+                     payment.refundedDate
+                        ? new Date(payment.refundedDate).toLocaleString()
+                        : "—"
+                  }</td>
+               </tr>`;
+               })
+               .join("");
+         }
 
          async function fetchPaymentHistory() {
             try {
-               const response = await fetch(
-                  "http://127.0.0.1:5000/api/payment/paymentHistory"
-               );
+               const response = await fetch("/api/payment/paymentHistory", {
+                  credentials: "include",
+               });
                const data = await response.json();
-               const tableBody = document.getElementById("paymentTableBody");
-               const allBtn = document.getElementById("allBtn");
-               const succeededBtn = document.getElementById("succeededBtn");
-               const refundedBtn = document.getElementById("refundedBtn");
-               const disputedBtn = document.getElementById("disputedBtn");
-               const failedBtn = document.getElementById("failedBtn");
+               allPayments = data.payments || [];
 
-               tableBody.innerHTML = "";
-
-               let succeededCount = 0,
-                  refundedCount = 0,
-                  disputedCount = 0,
-                  failedCount = 0;
-
-               data.payments.forEach((payment) => {
-                  if (payment.status === "succeeded") succeededCount++;
-                  if (payment.status === "refunded") refundedCount++;
-                  if (payment.status === "disputed") disputedCount++;
-                  if (payment.status === "failed") failedCount++;
-                  const formattedAmount = payment.amount
-                     ? `₹${(payment.amount / 100).toFixed(2)}`
-                     : "-";
-
-                  const row = document.createElement("tr");
-                  row.innerHTML = `
-                <td>${formattedAmount}</td>
-                <td>INR</td>
-                <td class="status my-4 ${payment.status}">${
-                     payment.status
-                        ? payment.status.charAt(0).toUpperCase() +
-                          payment.status.slice(1)
-                        : "-"
-                  }</td>
-                <td>${payment.paymentMethod || "Visa **** 4242"}</td>
-                <td>${payment.description || "-"}</td>
-                <td>${payment.customer || "-"}</td>
-                <td>${
-                   payment.date ? new Date(payment.date).toLocaleString() : "-"
-                }</td>
-                <td>${
-                   payment.refundedDate
-                      ? new Date(payment.refundedDate).toLocaleString()
-                      : "-"
-                }</td>
-            `;
-                  tableBody.appendChild(row);
+               const counts = {
+                  succeeded: 0,
+                  refunded: 0,
+                  disputed: 0,
+                  failed: 0,
+               };
+               allPayments.forEach((payment) => {
+                  if (counts[payment.status] !== undefined) {
+                     counts[payment.status]++;
+                  }
                });
 
-               allBtn.innerHTML = `All <strong>${data.payments.length}</strong>`;
-               succeededBtn.innerHTML = `Succeeded <strong>${succeededCount}</strong>`;
-               refundedBtn.innerHTML = `Refunded <strong>${refundedCount}</strong>`;
-               disputedBtn.innerHTML = `Disputed <strong>${disputedCount}</strong>`;
-               failedBtn.innerHTML = `Failed <strong>${failedCount}</strong>`;
+               document.getElementById("allCount").textContent =
+                  allPayments.length;
+               document.getElementById("succeededCount").textContent =
+                  counts.succeeded;
+               document.getElementById("refundedCount").textContent =
+                  counts.refunded;
+               document.getElementById("disputedCount").textContent =
+                  counts.disputed;
+               document.getElementById("failedCount").textContent =
+                  counts.failed;
+
+               renderPayments();
             } catch (error) {
-               console.error("Error fetching payment history:", error);
+               document.getElementById("paymentTableBody").innerHTML =
+                  '<tr><td class="table__empty" colspan="6">Could not load transactions.</td></tr>';
             }
          }
-         fetchPaymentHistory();
+
+         document.addEventListener("DOMContentLoaded", () => {
+            document
+               .getElementById("paymentChips")
+               .addEventListener("click", (event) => {
+                  const chip = event.target.closest(".chip");
+                  if (!chip) return;
+
+                  paymentFilter = chip.dataset.status || "";
+                  document
+                     .querySelectorAll("#paymentChips .chip")
+                     .forEach((item) => {
+                        item.setAttribute(
+                           "aria-pressed",
+                           item === chip ? "true" : "false"
+                        );
+                     });
+                  renderPayments();
+               });
+
+            fetchPaymentHistory();
+         });
       </script>
-      <script src="./static/js/coman/currentUser.js"></script>
    </body>
 </html>

@@ -1,30 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logout</title>
-    <script>
-        document.addEventListener("DOMContentLoaded", async function () {
-            console.log("Logout page loaded");
+   <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Signing out — ShopEase</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap"
+         rel="stylesheet"
+      />
+      <link rel="stylesheet" href="./static/css/theme.css" />
+   </head>
+
+   <body>
+      <main class="centered">
+         <div class="auth-card text-center">
+            <h1>Signing you out</h1>
+            <p class="auth-card__sub" id="logoutMessage">
+               One moment while we clear your session.
+            </p>
+            <a class="btn btn--ghost" href="./index.html">Go to the store</a>
+         </div>
+      </main>
+
+      <script>
+         document.addEventListener("DOMContentLoaded", async () => {
+            const message = document.getElementById("logoutMessage");
 
             try {
-                const response = await fetch("http://127.0.0.1:5000/api/auth/logout", {
-                    method: "GET",
-                    credentials: "include"
-                });
+               const response = await fetch("/api/auth/logout", {
+                  method: "GET",
+                  credentials: "include",
+               });
 
-                const data = await response.json();
-                if (response.ok) {
-                    alert("Logged out successfully!");
-                    window.location.href = "index.html";
-                }
+               if (response.ok) {
+                  message.textContent = "You are signed out. Redirecting…";
+                  setTimeout(() => {
+                     window.location.href = "index.html";
+                  }, 900);
+                  return;
+               }
+
+               throw new Error("Logout failed");
             } catch (error) {
-                console.error("Error logging out:", error);
-                alert("An error occurred during logout. Please try again.");
-                window.location.href = "index.html"; 
+               message.textContent =
+                  "We could not reach the server, but your session was cleared locally.";
+               setTimeout(() => {
+                  window.location.href = "index.html";
+               }, 1600);
             }
-        });
-    </script>
-</head>
+         });
+      </script>
+   </body>
 </html>

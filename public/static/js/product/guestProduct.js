@@ -1,163 +1,198 @@
+const guestStore = {
+   products: [],
+   category: "",
+   query: "",
+   sort: "featured",
+};
+
 async function fetchProducts() {
-    try {
-       const response = await fetch("http://127.0.0.1:5000/api/products");
-       if (!response.ok) throw new Error("Failed to fetch products");
- 
-       const data = await response.json();
-       const wishlist = await fetchWishlistItems();
-       displayProducts(data.products, wishlist);
-    } catch (error) {
-       document.getElementById("product-container").innerHTML =
-          "<p class='product-error'>Failed to load products.</p>";
-    }
- }
- 
- async function fetchProductsByCategory(category) {
-    try {
-       const url = category
-          ? `http://127.0.0.1:5000/api/products?category=${category}`
-          : "http://127.0.0.1:5000/api/products";
- 
-       const response = await fetch(url);
-       if (!response.ok) throw new Error("Failed to fetch products");
- 
-       const data = await response.json();
-       const wishlist = await fetchWishlistItems();
-       displayProducts(data.products, wishlist);
-    } catch (error) {
-       document.getElementById("product-container").innerHTML =
-          "<p class='product-error'>Failed to load products.</p>";
-    }
- }
- 
- 
- document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".category-link").forEach((categoryLink) => {
-       categoryLink.addEventListener("click", (event) => {
-          event.preventDefault();
-          const category = event.target.getAttribute("data-category");
-          fetchProductsByCategory(category);
-       });
-    });
- });
- 
- 
- async function fetchWishlistItems() {
-    
- }
- 
- function displayProducts(products, wishlist) {
-    const container = document.getElementById("product-container");
-    container.innerHTML = "";
- 
-    if (products.length === 0) {
-       container.innerHTML = "<p class='product-message'>No products found.</p>";
-       return;
-    }
- 
-    products.forEach((product) => {
-       const productCard = document.createElement("div");
-       productCard.classList.add("product-card");
-       productCard.innerHTML = `
-          <div class="product-item">
-          <img src="http://127.0.0.1:5000/${product.image}" alt="${
-          product.name
-       }" class="product-image"/>
-          <div class="product-info">
-             <h3 class="product-title">${product.name}</h3>
-             <p class="product-description">${
-                product.description || "No description available."
-             }</p>
-             <p class="product-category"><b>Category</b>: ${product.category}</p>
-             <p class="product-description review-link" data-product-id="${
-                product._id
-             }">
-                <strong>Reviews ⭐:</strong> ${product.numOfReviews}
-             </p>
-             <p class="product-description"><strong>Average Rating:</strong> ${"⭐".repeat(
-                product.averageRating
-             )}</p>
-             <p class="product-price">$${product.price.toFixed(2)}</p>
-              <button class="product-button add-to-cart" data-product-id="${product._id}">Add to Cart</button>
-          </div>
-       </div>`;
+   guestStore.category = "";
+   await loadGuestProducts();
+}
 
-       container.appendChild(productCard);
-    });
- 
-    document.querySelectorAll(".review-link").forEach((link) => {
-       link.addEventListener("click", async (event) => {
-          const productId = event.currentTarget.getAttribute("data-product-id");
-          if (!productId) return;
-          openReviewPopup(productId);
-       });
-    });
+async function fetchProductsByCategory(category) {
+   guestStore.category = category || "";
+   syncGuestChips();
+   await loadGuestProducts();
+}
 
-    document.querySelectorAll(".add-to-cart").forEach((button) => {
-      button.addEventListener("click", () => {
-         window.location.href = "./login.html";
+async function loadGuestProducts() {
+   const container = document.getElementById("product-container");
+   if (!container) return;
+
+   try {
+      const url = guestStore.category
+         ? `/api/products?category=${encodeURIComponent(guestStore.category)}`
+         : "/api/products";
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to fetch products");
+
+      const data = await response.json();
+      guestStore.products = data.products || [];
+      renderGuestProducts();
+   } catch (error) {
+      container.innerHTML = emptyStateMarkup(
+         "Could not load products",
+         "Something went wrong while reaching the store. Try again in a moment."
+      );
+      setResultCount(0);
+   }
+}
+
+function visibleGuestProducts() {
+   const query = guestStore.query.trim().toLowerCase();
+
+   let list = guestStore.products.filter((product) => {
+      if (!query) return true;
+      return (
+         String(product.name || "").toLowerCase().includes(query) ||
+         String(product.description || "").toLowerCase().includes(query)
+      );
+   });
+
+   if (guestStore.sort === "low") {
+      list = list.slice().sort((a, b) => a.price - b.price);
+   } else if (guestStore.sort === "high") {
+      list = list.slice().sort((a, b) => b.price - a.price);
+   } else if (guestStore.sort === "rating") {
+      list = list
+         .slice()
+         .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+   }
+
+   return list;
+}
+
+function renderGuestProducts() {
+   const container = document.getElementById("product-container");
+   if (!container) return;
+
+   const list = visibleGuestProducts();
+   setResultCount(list.length);
+
+   if (!list.length) {
+      container.innerHTML = emptyStateMarkup(
+         "No products found",
+         "Try a different category or clear your search to see everything."
+      );
+      return;
+   }
+
+   container.innerHTML = list
+      .map((product) => productCardMarkup(product))
+      .join("");
+}
+
+function syncGuestChips() {
+   document.querySelectorAll("#chips .chip").forEach((chip) => {
+      const isOn = (chip.dataset.cat || "") === guestStore.category;
+      chip.setAttribute("aria-pressed", isOn ? "true" : "false");
+   });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+   const chips = document.getElementById("chips");
+   if (chips) {
+      chips.addEventListener("click", (event) => {
+         const chip = event.target.closest(".chip");
+         if (!chip) return;
+         fetchProductsByCategory(chip.dataset.cat || "");
       });
-  });
- }
- 
+   }
 
- async function openReviewPopup(productId) {
-    if (!productId) {
-       alert("Error: Product ID is missing.");
-       return;
-    }
-    try {
-       const response = await fetch(
-          `http://127.0.0.1:5000/api/reviews/product/${productId}`
-       );
-       if (!response.ok) throw new Error("Failed to fetch reviews");
-       const data = await response.json();
-       displayReviewsPopup(data.reviews);
-    } catch (error) {
-       alert("Failed to load reviews.");
-    }
- }
- 
- function displayReviewsPopup(reviews) {
-    const overlay = document.createElement("div");
-    overlay.classList.add("review-overlay");
-    const popup = document.createElement("div");
-    popup.classList.add("review-popup");
-    popup.innerHTML = `
-       <div class="review-popup-content">
-          <span class="close-popup">&times;</span>
-          <h2>Product Reviews</h2>
-          <div class="review-list">
-             ${
-                reviews.length > 0
-                   ? reviews
-                        .map(
-                           (review) => `
-                <div class="review-item">
-                   <p class="review-title">${review.title}</p>
-                   <p class="review-rating">${"⭐".repeat(review.rating)}</p>
-                   <p class="review-comment">${review.comment}</p>
-                   <p class="review-user"><strong> By : ${
-                      review.user.name
-                   } </strong></p>
-                </div>
-                `
-                        )
-                        .join("")
-                   : "<p>No reviews available.</p>"
-             }
-          </div>
-       </div>
-    `;
-    overlay.appendChild(popup);
-    document.body.appendChild(overlay);
-    popup.querySelector(".close-popup").addEventListener("click", () => {
-       overlay.remove();
-    });
-    overlay.addEventListener("click", (event) => {
-       if (event.target === overlay) overlay.remove();
-    });
- }
- 
- fetchProducts();
- 
+   const sort = document.getElementById("sort");
+   if (sort) {
+      sort.addEventListener("change", (event) => {
+         guestStore.sort = event.target.value;
+         renderGuestProducts();
+      });
+   }
+});
+
+let guestSearchTimer = null;
+document.addEventListener("input", (event) => {
+   if (event.target.id !== "searchInput") return;
+   clearTimeout(guestSearchTimer);
+   guestSearchTimer = setTimeout(() => {
+      guestStore.query = event.target.value;
+      renderGuestProducts();
+   }, 180);
+});
+
+document.addEventListener("click", (event) => {
+   if (event.target.closest(".add-to-cart")) {
+      toast("Sign in to start a cart");
+      setTimeout(() => {
+         window.location.href = "./login.html";
+      }, 700);
+      return;
+   }
+
+   const review = event.target.closest(".review-link");
+   if (review) openGuestReviewPopup(review.dataset.productId);
+});
+
+async function openGuestReviewPopup(productId) {
+   if (!productId) return;
+
+   try {
+      const response = await fetch(`/api/reviews/product/${productId}`);
+      if (!response.ok) throw new Error("Failed to fetch reviews");
+
+      const data = await response.json();
+      showGuestReviews(data.reviews || []);
+   } catch (error) {
+      toastError("Could not load reviews");
+   }
+}
+
+function showGuestReviews(reviews) {
+   const existing = document.getElementById("review-modal");
+   if (existing) existing.remove();
+
+   const modal = document.createElement("div");
+   modal.className = "modal is-on";
+   modal.id = "review-modal";
+   modal.innerHTML = `
+      <div class="modal__panel" role="dialog" aria-modal="true" aria-label="Product reviews">
+         <div class="modal__head">
+            <h2 class="modal__title">Reviews</h2>
+            <button class="modal__close" type="button" aria-label="Close">&times;</button>
+         </div>
+         <div class="rows">
+            ${
+               reviews.length
+                  ? reviews
+                       .map(
+                          (review) => `
+                  <div class="row" style="flex-direction:column;align-items:flex-start;gap:6px">
+                     <strong style="font-size:15px">${escapeHtml(review.title)}</strong>
+                     <span class="muted" style="font-size:13px">${"★".repeat(
+                        review.rating
+                     )}${"☆".repeat(Math.max(0, 5 - review.rating))}</span>
+                     <p style="margin:0;font-size:14px;color:var(--ink-2)">${escapeHtml(
+                        review.comment
+                     )}</p>
+                     <span class="muted" style="font-size:12.5px">${escapeHtml(
+                        review.user ? review.user.name : "Customer"
+                     )}</span>
+                  </div>`
+                       )
+                       .join("")
+                  : '<p class="muted" style="margin:0">No reviews yet for this product.</p>'
+            }
+         </div>
+      </div>`;
+
+   document.body.appendChild(modal);
+
+   modal.querySelector(".modal__close").addEventListener("click", () => {
+      modal.remove();
+   });
+   modal.addEventListener("click", (event) => {
+      if (event.target === modal) modal.remove();
+   });
+}
+
+loadGuestProducts();

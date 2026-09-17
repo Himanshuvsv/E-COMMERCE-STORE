@@ -1,155 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Admin Dashboard</title>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Add product — ShopEase Admin</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
       <link
+         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap"
          rel="stylesheet"
-         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       />
-      <link
-         rel="stylesheet"
-         href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
-      />
-      <link rel="stylesheet" href="./static/css/admin/dashboard.css" />
-      <link rel="stylesheet" href="./static/css/admin/addProduct.css">
+      <link rel="stylesheet" href="./static/css/theme.css" />
    </head>
+
    <body>
-      <!-- Navbar -->
-      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-         <a class="navbar-brand" href="#">
-            <img
-               src="./logo.jpeg"
-               width="30"
-               height="30"
-               class="d-inline-block align-top"
-               alt="Profile Image"
-            />
-            SHOPEASE DASHBOARD
-         </a>
-         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-               <li class="nav-item active">
-                  <a class="nav-link" href="./dashboard.html">Home</a>
-               </li>
-               
-               <li class="nav-item dropdown">
-                  <a
-                     class="nav-link dropdown-toggle"
-                     href="#"
-                     id="userDropdown"
-                     role="button"
-                     data-toggle="dropdown"
-                     aria-haspopup="true"
-                     aria-expanded="false"
-                  >
-                     <img
-                        src="./profile.png"
-                        width="30"
-                        height="30"
-                        class="rounded-circle"
-                        alt="User"
-                     />
-                     <span id="username">mazipan</span>
-                  </a>
-                  <div
-                     class="dropdown-menu dropdown-menu-right"
-                     aria-labelledby="userDropdown"
-                  >
-                     <a class="dropdown-item" href="./adminProfile.html">Profile</a>
-                     <a class="dropdown-item text-danger" href="./logout.html"
-                        >Log Out</a
-                     >
-                  </div>
-               </li>
-            </ul>
-         </div>
-      </nav>
-      <!-- Sidebar and Main Content -->
-      <div class="d-flex">
-         <div class="sidebar p-3">
-            <div class="header text-center">
-               <h1 style="color: red">SHOPESEA</h1>
+      <div id="admin-header"></div>
+
+      <div class="admin">
+         <div id="admin-sidebar"></div>
+
+         <main class="admin-main">
+            <div class="head" style="padding-top: 0">
+               <h1 class="head__title">Add a product</h1>
+               <p class="head__sub">
+                  New products appear in the storefront as soon as they are
+                  saved.
+               </p>
             </div>
-            <ul class="list-unstyled">
-               <li><a href="./dashboard.html">Dashboard</a></li>
-               <li><a href="./viewCustommerce.html">Customers</a></li>
-               <li><a href="./add-products.html">Add Products</a></li>
-               <li><a href="./adminProductList.html">Manage Products</a></li>
-               <li><a href="./orders.html">Orders</a></li>
-               <li><a href="./adminReviews.html">Reviews</a></li>
-               <li><a href="./adminPaymentHistory.html">Payments</a></li>
-               <li><a class="text-danger" href="./logout.html">Log Out</a></li>
-            </ul>
-         </div>
 
-    
-         <div class="container">
-            <h2>Add Product</h2>
-         
-            <form id="addProductForm">
-               <label for="name">Product Name:</label>
-               <input type="text" id="name" name="name" required />
-         
-               <label for="price">Price:</label>
-               <input type="number" id="price" name="price" required />
-         
-               <label for="description">Description:</label>
-               <textarea
-                  id="description"
-                  name="description"
-                  required
-               ></textarea>
-         
-               <label for="image">Image:</label>
-               <input type="file" id="image" name="image" />
-         
-               <label for="category">Category:</label>
-               <select id="category" name="category" required>
-                  <option value="office">Office</option>
-                  <option value="kitchen">Kitchen</option>
-                  <option value="bedroom">Bedroom</option>
-               </select>
-         
-               <label for="company">Company:</label>
-               <select id="company" name="company" required>
-                  <option value="ikea">IKEA</option>
-                  <option value="liddy">Liddy</option>
-                  <option value="marcos">Marcos</option>
-               </select>
-         
-               <label for="colors">Colors :</label>
-               <input type="text" id="colors" name="colors" />
-         
-               <label>
-                  Featured Product
-                  <input type="checkbox" id="featured" name="featured" />
-               </label>
-         
-               <label>
-                  Free Shipping
-                  <input
-                     type="checkbox"
-                     id="freeShipping"
-                     name="freeShipping"
-                  />
-               </label>
-         
-               <label for="inventory">Inventory:</label>
-               <input type="number" id="inventory" name="inventory" />
-         
-               <button type="submit">Add Product</button>
+            <form id="addProductForm" style="margin-top: 26px; max-width: 760px">
+               <div class="card">
+                  <div class="card__head">
+                     <div>
+                        <h2 class="card__title">Details</h2>
+                        <p class="card__sub">Name, price and description</p>
+                     </div>
+                  </div>
+
+                  <div class="form-grid">
+                     <div class="field form-grid--full">
+                        <label for="name">Product name</label>
+                        <input type="text" id="name" name="name" required />
+                     </div>
+
+                     <div class="field">
+                        <label for="price">Price</label>
+                        <input
+                           type="number"
+                           id="price"
+                           name="price"
+                           step="0.01"
+                           min="0"
+                           required
+                        />
+                     </div>
+
+                     <div class="field">
+                        <label for="inventory">Inventory</label>
+                        <input type="number" id="inventory" name="inventory" min="0" />
+                     </div>
+
+                     <div class="field form-grid--full">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" required></textarea>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="card" style="margin-top: 16px">
+                  <div class="card__head">
+                     <div>
+                        <h2 class="card__title">Classification</h2>
+                        <p class="card__sub">Category, brand and colours</p>
+                     </div>
+                  </div>
+
+                  <div class="form-grid">
+                     <div class="field">
+                        <label for="category">Category</label>
+                        <select id="category" name="category" required>
+                           <option value="office">Office</option>
+                           <option value="kitchen">Kitchen</option>
+                           <option value="bedroom">Bedroom</option>
+                        </select>
+                     </div>
+
+                     <div class="field">
+                        <label for="company">Company</label>
+                        <select id="company" name="company" required>
+                           <option value="ikea">IKEA</option>
+                           <option value="liddy">Liddy</option>
+                           <option value="marcos">Marcos</option>
+                        </select>
+                     </div>
+
+                     <div class="field form-grid--full">
+                        <label for="colors">Colours</label>
+                        <input type="text" id="colors" name="colors" placeholder="#222, #555" />
+                        <span class="field__hint">Comma separated hex values.</span>
+                     </div>
+
+                     <div class="field form-grid--full">
+                        <label for="image">Image</label>
+                        <input type="file" id="image" name="image" accept="image/*" />
+                     </div>
+
+                     <div class="form-grid--full actions">
+                        <label
+                           style="
+                              display: inline-flex;
+                              align-items: center;
+                              gap: 8px;
+                              font-weight: 500;
+                           "
+                        >
+                           <input type="checkbox" id="featured" name="featured" />
+                           Featured product
+                        </label>
+                        <label
+                           style="
+                              display: inline-flex;
+                              align-items: center;
+                              gap: 8px;
+                              font-weight: 500;
+                           "
+                        >
+                           <input
+                              type="checkbox"
+                              id="freeShipping"
+                              name="freeShipping"
+                           />
+                           Free shipping
+                        </label>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="actions" style="margin-top: 20px">
+                  <button class="btn" type="submit">Add product</button>
+                  <a class="btn btn--ghost" href="./adminProductList.html"
+                     >Back to products</a
+                  >
+               </div>
             </form>
-         </div>
-
-
-
+         </main>
       </div>
-      <script src="./static/js/product/createProduct.js"></script>
+
+      <script src="./static/js/coman/nav.js"></script>
+      <script src="./static/js/coman/toast.js"></script>
       <script src="./static/js/coman/currentUser.js"></script>
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="./static/js/coman/adminShell.js"></script>
+      <script src="./static/js/product/createProduct.js"></script>
    </body>
 </html>
-

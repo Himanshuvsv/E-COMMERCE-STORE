@@ -1,60 +1,83 @@
+let allCustomers = [];
+
 async function displayUsers() {
-    try {
-       const response = await fetch(
-          "http://127.0.0.1:5000/api/users",
-          {
-             method: "GET",
-             credentials: "include",
-             headers: { "Content-Type": "application/json" },
-          }
-       );
+   const body = document.getElementById("customerTable");
+   if (!body) return;
 
-       if (!response.ok) {
-          throw new Error("Error fetching users");
-       }
+   try {
+      const response = await fetch("/api/users", {
+         method: "GET",
+         credentials: "include",
+         headers: { "Content-Type": "application/json" },
+      });
 
-       const data = await response.json();
-       if (!data || !data.users || data.users.length === 0) {
-          throw new Error("No users available to fetch");
-       }
-       console.log("Data from API:", data);
+      if (!response.ok) throw new Error("Error fetching users");
 
-       const customerTable =
-          document.getElementById("customerTable");
-       customerTable.innerHTML = "";
-       data.users.forEach((user) => {
-          const row = document.createElement("tr");
-          const idCell = document.createElement("td");
-          idCell.innerText = user._id;
-          row.appendChild(idCell);
-          const dateCell = document.createElement("td");
-          const formattedDate = new Date(
-             user.createdAt
-          ).toLocaleDateString("en-GB", {
-             weekday: "long",
-             day: "numeric",
-             month: "long",
-             year: "numeric",
-          });
-          dateCell.innerText = formattedDate;
-          row.appendChild(dateCell);
-          const nameCell = document.createElement("td");
-          nameCell.innerText = user.name;
-          row.appendChild(nameCell);
-          const emailCell = document.createElement("td");
-          emailCell.innerText = user.email;
-          row.appendChild(emailCell);
-          const actionsCell = document.createElement("td");
-          actionsCell.innerHTML = `
-                 <button>🔍</button>
-                 <button>✏️</button>
-                 <button>🗑️</button>
-             `;
-          row.appendChild(actionsCell);
-          customerTable.appendChild(row);
-       });
-    } catch (error) {
-       console.error("Error:", error);
-    }
- }
- displayUsers();
+      const data = await response.json();
+      allCustomers = data.users || [];
+      renderCustomers();
+   } catch (error) {
+      body.innerHTML =
+         '<tr><td class="table__empty" colspan="4">Could not load customers.</td></tr>';
+   }
+}
+
+function renderCustomers() {
+   const body = document.getElementById("customerTable");
+   const count = document.getElementById("customerCount");
+   const query = (document.getElementById("searchInput")?.value || "")
+      .trim()
+      .toLowerCase();
+
+   const rows = allCustomers.filter((user) => {
+      if (!query) return true;
+      return (
+         String(user.name || "").toLowerCase().includes(query) ||
+         String(user.email || "").toLowerCase().includes(query)
+      );
+   });
+
+   if (count) {
+      count.textContent =
+         rows.length + (rows.length === 1 ? " customer" : " customers");
+   }
+
+   if (!rows.length) {
+      body.innerHTML =
+         '<tr><td class="table__empty" colspan="4">No customers match that search.</td></tr>';
+      return;
+   }
+
+   body.innerHTML = rows
+      .map((user) => {
+         const joined = new Date(user.createdAt).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+         });
+
+         return `
+         <tr>
+            <td data-label="Name"><strong style="color:var(--ink)">${
+               user.name
+            }</strong></td>
+            <td data-label="Email">${user.email}</td>
+            <td data-label="Joined">${joined}</td>
+            <td data-label="Customer ID"><span class="muted" style="font-size:12.5px">${user._id}</span></td>
+         </tr>`;
+      })
+      .join("");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+   const search = document.getElementById("searchInput");
+   if (search) {
+      let timer = null;
+      search.addEventListener("input", () => {
+         clearTimeout(timer);
+         timer = setTimeout(renderCustomers, 180);
+      });
+   }
+
+   displayUsers();
+});

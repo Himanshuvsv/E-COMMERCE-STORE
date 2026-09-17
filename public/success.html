@@ -1,21 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Success</title>
-    <link rel="stylesheet" href="./static/css/user/success.css">
-    <link rel="stylesheet" href="./static/css/user/success.css">
-</head>
-<body>
-    <div class="success-container">
-        <div class="success-message">
-            <h1>🎉 Payment Successful! 🎉</h1>
-            <p>Your order has been placed successfully.</p>
-            <p>Thank you for shopping with us!</p>
-            <a href="./viewOrder.html" class="btn">View Orders</a>
-            <a href="./index2.html" class="btn home">Back to Home</a>
-        </div>
-    </div>
-</body>
+   <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Order placed — ShopEase</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap"
+         rel="stylesheet"
+      />
+      <link rel="stylesheet" href="./static/css/theme.css" />
+   </head>
+
+   <body>
+      <main class="centered">
+         <div class="auth-card text-center">
+            <div
+               style="
+                  width: 56px;
+                  height: 56px;
+                  margin: 0 auto 18px;
+                  border-radius: 50%;
+                  background: var(--accent-soft);
+                  display: grid;
+                  place-items: center;
+                  color: var(--accent);
+               "
+            >
+               <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  width="26"
+                  height="26"
+                  aria-hidden="true"
+               >
+                  <path d="m5 12.5 4.5 4.5L19 7.5" />
+               </svg>
+            </div>
+
+            <h1>Order placed</h1>
+            <p class="auth-card__sub">
+               Thank you. We have emailed your receipt and will let you know
+               when your order ships.
+            </p>
+
+            <div class="actions" style="justify-content: center">
+               <a class="btn" href="./viewOrder.html">View your orders</a>
+               <a class="btn btn--ghost" href="./index2.html"
+                  >Continue shopping</a
+               >
+            </div>
+         </div>
+      </main>
+   </body>
 </html>

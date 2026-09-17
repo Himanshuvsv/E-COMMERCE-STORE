@@ -1,235 +1,278 @@
-async function fetchProducts() {
-   try {
-      const response = await fetch("http://127.0.0.1:5000/api/products");
-      if (!response.ok) throw new Error("Failed to fetch products");
+const store = {
+   products: [],
+   wishlist: new Map(),
+   category: "",
+   query: "",
+   sort: "featured",
+};
 
-      const data = await response.json();
-      const wishlist = await fetchWishlistItems();
-      displayProducts(data.products, wishlist);
-   } catch (error) {
-      document.getElementById("product-container").innerHTML =
-         "<p class='product-error'>Failed to load products.</p>";
-   }
+async function fetchProducts() {
+   store.category = "";
+   await loadProducts();
 }
 
 async function fetchProductsByCategory(category) {
+   store.category = category || "";
+   syncChips();
+   await loadProducts();
+}
+
+async function loadProducts() {
+   const container = document.getElementById("product-container");
+   if (!container) return;
+
    try {
-      const url = category
-         ? `http://127.0.0.1:5000/api/products?category=${category}`
-         : "http://127.0.0.1:5000/api/products";
+      const url = store.category
+         ? `/api/products?category=${encodeURIComponent(store.category)}`
+         : "/api/products";
 
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch products");
 
       const data = await response.json();
-      const wishlist = await fetchWishlistItems();
-      displayProducts(data.products, wishlist);
+      store.products = data.products || [];
+      store.wishlist = await fetchWishlistItems();
+      renderProducts();
    } catch (error) {
-      document.getElementById("product-container").innerHTML =
-         "<p class='product-error'>Failed to load products.</p>";
+      container.innerHTML = emptyStateMarkup(
+         "Could not load products",
+         "Something went wrong while reaching the store. Try again in a moment."
+      );
+      setResultCount(0);
    }
 }
 
-
-document.addEventListener("DOMContentLoaded", () => {
-   document.querySelectorAll(".category-link").forEach((categoryLink) => {
-      categoryLink.addEventListener("click", (event) => {
-         event.preventDefault();
-         const category = event.target.getAttribute("data-category");
-         fetchProductsByCategory(category);
-      });
-   });
-});
-
-
 async function fetchWishlistItems() {
    try {
-      const response = await fetch(
-         "http://127.0.0.1:5000/api/wishlist/showMyWishlist",
-         {
-            method: "GET",
-            credentials: "include",
-         }
-      );
+      const response = await fetch("/api/wishlist/showMyWishlist", {
+         method: "GET",
+         credentials: "include",
+      });
       if (!response.ok) throw new Error("Failed to fetch wishlist items");
+
       const data = await response.json();
       if (!data.wishlistData || !Array.isArray(data.wishlistData)) {
          return new Map();
       }
+
       const wishlistMap = new Map();
       data.wishlistData.forEach((item) => {
          if (item.product && item.product._id) {
             wishlistMap.set(item.product._id, item._id);
          }
       });
-
       return wishlistMap;
    } catch (error) {
-      console.error("Error fetching wishlist items:", error);
       return new Map();
    }
 }
 
-function displayProducts(products, wishlist) {
-   const container = document.getElementById("product-container");
-   container.innerHTML = "";
+function visibleProducts() {
+   const query = store.query.trim().toLowerCase();
 
-   if (products.length === 0) {
-      container.innerHTML = "<p class='product-message'>No products found.</p>";
+   let list = store.products.filter((product) => {
+      if (!query) return true;
+      return (
+         String(product.name || "").toLowerCase().includes(query) ||
+         String(product.description || "").toLowerCase().includes(query)
+      );
+   });
+
+   if (store.sort === "low") {
+      list = list.slice().sort((a, b) => a.price - b.price);
+   } else if (store.sort === "high") {
+      list = list.slice().sort((a, b) => b.price - a.price);
+   } else if (store.sort === "rating") {
+      list = list
+         .slice()
+         .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+   }
+
+   return list;
+}
+
+function renderProducts() {
+   const container = document.getElementById("product-container");
+   if (!container) return;
+
+   const list = visibleProducts();
+   setResultCount(list.length);
+
+   if (!list.length) {
+      container.innerHTML = emptyStateMarkup(
+         "No products found",
+         "Try a different category or clear your search to see everything."
+      );
       return;
    }
 
-   products.forEach((product) => {
-      const isInWishlist = wishlist.has(product._id);
-      const heartIcon = isInWishlist ? "❤️" : "♡";
-      const productCard = document.createElement("div");
-      productCard.classList.add("product-card");
-      productCard.innerHTML = `
-         <div class="product-item">
-         <img src="http://127.0.0.1:5000/${product.image}" alt="${
-         product.name
-      }" class="product-image"/>
-         <div class="product-info">
-            <h3 class="product-title">${product.name}</h3>
-            <p class="product-description">${
-               product.description || "No description available."
-            }</p>
-            <p class="product-category"><b>Category</b>: ${product.category}</p>
-            <p class="product-description review-link" data-product-id="${
-               product._id
-            }">
-               <strong>Reviews ⭐:</strong> ${product.numOfReviews}
-            </p>
-            <p class="product-description"><strong>Average Rating:</strong> ${"⭐".repeat(
-               product.averageRating
-            )}</p>
-            <p class="product-price">$${product.price.toFixed(2)}</p>
-            <button class="product-button">Add to Cart</button>
-            <span class="wishlist-icon" data-product-id="${
-               product._id
-            }">${heartIcon}</span>
-         </div>
-      </div>`;
-// ₹
-      container.appendChild(productCard);
-   });
+   container.innerHTML = list
+      .map((product) =>
+         productCardMarkup(product, {
+            wishlist: true,
+            inWishlist: store.wishlist.has(product._id),
+         })
+      )
+      .join("");
+}
 
-   // Add event listeners for wishlist icons
-   document.querySelectorAll(".wishlist-icon").forEach((icon) => {
-      icon.addEventListener("click", async (event) => {
-         const productId = event.currentTarget.getAttribute("data-product-id");
-         await toggleWishlist(productId, event.currentTarget);
-      });
-   });
+// Kept for the category links that still live in the nav markup.
+function displayProducts(products, wishlist) {
+   store.products = products || [];
+   store.wishlist = wishlist || new Map();
+   renderProducts();
+}
 
-   // Add event listeners for reviews
-   document.querySelectorAll(".review-link").forEach((link) => {
-      link.addEventListener("click", async (event) => {
-         const productId = event.currentTarget.getAttribute("data-product-id");
-         if (!productId) return;
-         openReviewPopup(productId);
-      });
+function syncChips() {
+   document.querySelectorAll("#chips .chip").forEach((chip) => {
+      const isOn = (chip.dataset.cat || "") === store.category;
+      chip.setAttribute("aria-pressed", isOn ? "true" : "false");
    });
 }
 
-async function toggleWishlist(productId, iconElement) {
+document.addEventListener("DOMContentLoaded", () => {
+   const chips = document.getElementById("chips");
+   if (chips) {
+      chips.addEventListener("click", (event) => {
+         const chip = event.target.closest(".chip");
+         if (!chip) return;
+         fetchProductsByCategory(chip.dataset.cat || "");
+      });
+   }
+
+   const sort = document.getElementById("sort");
+   if (sort) {
+      sort.addEventListener("change", (event) => {
+         store.sort = event.target.value;
+         renderProducts();
+      });
+   }
+});
+
+// The header search lives in the injected navbar, so it is bound by delegation.
+let searchTimer = null;
+document.addEventListener("input", (event) => {
+   if (event.target.id !== "searchInput") return;
+   clearTimeout(searchTimer);
+   searchTimer = setTimeout(() => {
+      store.query = event.target.value;
+      renderProducts();
+   }, 180);
+});
+
+document.addEventListener("click", async (event) => {
+   const fav = event.target.closest(".fav");
+   if (fav) {
+      await toggleWishlist(fav.dataset.productId, fav);
+      return;
+   }
+
+   const review = event.target.closest(".review-link");
+   if (review) openReviewPopup(review.dataset.productId);
+});
+
+async function toggleWishlist(productId, favElement) {
    try {
       const wishlistMap = await fetchWishlistItems();
       const wishlistId = wishlistMap.get(productId);
 
       if (wishlistId) {
-         // Remove from wishlist
-         const response = await fetch(
-            `http://127.0.0.1:5000/api/wishlist/${wishlistId}`,
-            {
-               method: "DELETE",
-               credentials: "include",
-            }
-         );
-
-         if (response.ok) {
-            iconElement.textContent = "♡";
-            alert("Removed from wishlist");
-         } else {
-            alert("Error: Failed to remove from wishlist");
-         }
-      } else {
-         // Add to wishlist
-         const response = await fetch("http://127.0.0.1:5000/api/wishlist", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+         const response = await fetch(`/api/wishlist/${wishlistId}`, {
+            method: "DELETE",
             credentials: "include",
-            body: JSON.stringify({ productId }),
          });
 
-         if (response.ok) {
-            iconElement.textContent = "❤️";
-            alert("Successfully added to wishlist!");
-         } else {
-            alert("Error: Failed to add to wishlist");
+         if (!response.ok) {
+            toastError("Could not remove from wishlist");
+            return;
          }
+
+         favElement.setAttribute("aria-pressed", "false");
+         store.wishlist.delete(productId);
+         toast("Removed from your wishlist");
+         return;
       }
+
+      const response = await fetch("/api/wishlist", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         credentials: "include",
+         body: JSON.stringify({ productId }),
+      });
+
+      if (!response.ok) {
+         toastError("Could not add to wishlist");
+         return;
+      }
+
+      favElement.setAttribute("aria-pressed", "true");
+      store.wishlist.set(productId, true);
+      toast("Saved to your wishlist");
    } catch (error) {
-      alert("An unexpected error occurred. Please try again later.");
+      toastError("Something went wrong. Please try again.");
    }
 }
 
 async function openReviewPopup(productId) {
-   if (!productId) {
-      alert("Error: Product ID is missing.");
-      return;
-   }
+   if (!productId) return;
+
    try {
-      const response = await fetch(
-         `http://127.0.0.1:5000/api/reviews/product/${productId}`
-      );
+      const response = await fetch(`/api/reviews/product/${productId}`);
       if (!response.ok) throw new Error("Failed to fetch reviews");
+
       const data = await response.json();
-      displayReviewsPopup(data.reviews);
+      displayReviewsPopup(data.reviews || []);
    } catch (error) {
-      alert("Failed to load reviews.");
+      toastError("Could not load reviews");
    }
 }
 
 function displayReviewsPopup(reviews) {
-   const overlay = document.createElement("div");
-   overlay.classList.add("review-overlay");
-   const popup = document.createElement("div");
-   popup.classList.add("review-popup");
-   popup.innerHTML = `
-      <div class="review-popup-content">
-         <span class="close-popup">&times;</span>
-         <h2>Product Reviews</h2>
-         <div class="review-list">
+   const existing = document.getElementById("review-modal");
+   if (existing) existing.remove();
+
+   const modal = document.createElement("div");
+   modal.className = "modal is-on";
+   modal.id = "review-modal";
+   modal.innerHTML = `
+      <div class="modal__panel" role="dialog" aria-modal="true" aria-label="Product reviews">
+         <div class="modal__head">
+            <h2 class="modal__title">Reviews</h2>
+            <button class="modal__close" type="button" aria-label="Close">&times;</button>
+         </div>
+         <div class="rows">
             ${
-               reviews.length > 0
+               reviews.length
                   ? reviews
                        .map(
                           (review) => `
-               <div class="review-item">
-                  <p class="review-title">${review.title}</p>
-                  <p class="review-rating">${"⭐".repeat(review.rating)}</p>
-                  <p class="review-comment">${review.comment}</p>
-                  <p class="review-user"><strong> By : ${
-                     review.user.name
-                  } </strong></p>
-               </div>
-               `
+                  <div class="row" style="flex-direction:column;align-items:flex-start;gap:6px">
+                     <strong style="font-size:15px">${escapeHtml(review.title)}</strong>
+                     <span class="muted" style="font-size:13px">${"★".repeat(
+                        review.rating
+                     )}${"☆".repeat(Math.max(0, 5 - review.rating))}</span>
+                     <p style="margin:0;font-size:14px;color:var(--ink-2)">${escapeHtml(
+                        review.comment
+                     )}</p>
+                     <span class="muted" style="font-size:12.5px">${escapeHtml(
+                        review.user ? review.user.name : "Customer"
+                     )}</span>
+                  </div>`
                        )
                        .join("")
-                  : "<p>No reviews available.</p>"
+                  : '<p class="muted" style="margin:0">No reviews yet for this product.</p>'
             }
          </div>
-      </div>
-   `;
-   overlay.appendChild(popup);
-   document.body.appendChild(overlay);
-   popup.querySelector(".close-popup").addEventListener("click", () => {
-      overlay.remove();
+      </div>`;
+
+   document.body.appendChild(modal);
+
+   modal.querySelector(".modal__close").addEventListener("click", () => {
+      modal.remove();
    });
-   overlay.addEventListener("click", (event) => {
-      if (event.target === overlay) overlay.remove();
+   modal.addEventListener("click", (event) => {
+      if (event.target === modal) modal.remove();
    });
 }
 
-fetchProducts();
+loadProducts();

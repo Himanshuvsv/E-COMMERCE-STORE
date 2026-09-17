@@ -1,6 +1,9 @@
 async function fetchUser() {
+   const nameNode = document.getElementById("username");
+   if (!nameNode) return;
+
    try {
-      const response = await fetch("http://127.0.0.1:5000/api/users/showMe", {
+      const response = await fetch("/api/users/showMe", {
          method: "GET",
          credentials: "include",
          headers: { "Content-Type": "application/json" },
@@ -11,10 +14,11 @@ async function fetchUser() {
          throw new Error("Failed to fetch user");
       }
 
-      document.getElementById("username").textContent =
-         currentdata.user.name || "User";
+      nameNode.textContent = currentdata.user.name || "User";
    } catch (error) {
-      console.error("Error fetching user:", error);
+      /* Navbar may not be injected yet; shell/adminShell retry after load. */
    }
 }
+
+window.fetchUser = fetchUser;
 fetchUser();

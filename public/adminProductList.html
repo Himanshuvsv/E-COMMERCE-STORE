@@ -1,140 +1,109 @@
-
 <!DOCTYPE html>
 <html lang="en">
    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Admin Dashboard</title>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Products — ShopEase Admin</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
       <link
+         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap"
          rel="stylesheet"
-         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       />
-      <link
-         rel="stylesheet"
-         href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
-      />
-      <link rel="stylesheet" href="./static/css/admin/dashboard.css" />
-      <link rel="stylesheet" href="./static/css/admin/adminProductList.css" />
-      <link rel="stylesheet" href="./static/css/admin/editProduct.css">
+      <link rel="stylesheet" href="./static/css/theme.css" />
    </head>
+
    <body>
-      <!-- Navbar -->
-      <nav class="header1 navbar navbar-expand-lg navbar-dark bg-primary">
-         <a class="navbar-brand" href="#">
-            <img
-               src="./logo.jpeg"
-               width="30"
-               height="30"
-               class="d-inline-block align-top"
-               alt="Profile Image"
-            />
-            SHOPEASE DASHBOARD
-         </a>
-         
-         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-               <li class="nav-item active">
-                  <a class="nav-link" href="./dashboard.html">Home</a>
-               </li>
-               
-               <li class="nav-item dropdown">
-                  <a
-                     class="nav-link dropdown-toggle"
-                     href="#"
-                     id="userDropdown"
-                     role="button"
-                     data-toggle="dropdown"
-                     aria-haspopup="true"
-                     aria-expanded="false"
-                  >
-                     <img
-                        src="./profile.png"
-                        width="30"
-                        height="30"
-                        class="rounded-circle"
-                        alt="User"
-                     />
-                     <span id="username">mazipan</span>
-                  </a>
-                  <div
-                     class="dropdown-menu dropdown-menu-right"
-                     aria-labelledby="userDropdown"
-                  >
-                     <a class="dropdown-item" href="./adminProfile.html"
-                        >Profile</a
-                     >
-                     <a class="dropdown-item text-danger" href="./logout.html"
-                        >Log Out</a
-                     >
-                  </div>
-               </li>
-            </ul>
-         </div>
-      </nav>
-      <!-- Sidebar and Main Content -->
-      <div class="d-flex">
-         <div class="sidebar p-3">
-            <div class="header text-center">
-               <h1 style="color: red">SHOPESEA</h1>
+      <div id="admin-header"></div>
+
+      <div class="admin">
+         <div id="admin-sidebar"></div>
+
+         <main class="admin-main">
+            <div class="head" style="padding-top: 0">
+               <h1 class="head__title">Products</h1>
+               <p class="head__sub">
+                  Edit pricing, stock and imagery for everything in the catalog.
+               </p>
             </div>
-            <ul class="list-unstyled">
-               <li><a href="./dashboard.html">Dashboard</a></li>
-               <li><a href="./viewCustommerce.html">Customers</a></li>
-               <li><a href="./add-products.html">Add Products</a></li>
-               <li><a href="./adminProductList.html">Manage Products</a></li>
-               <li><a href="./orders.html">Orders</a></li>
-               <li><a href="./adminReviews.html">Reviews</a></li>
-               <li><a href="./adminPaymentHistory.html">Payments</a></li>
-               <li><a class="text-danger" href="./logout.html">Log Out</a></li>
-            </ul>
-         </div>
-         
-         <div class="container">
-            <h2>Manage Products</h2>
-         <div class="search-filter">
-            <input
-               type="text"
-               placeholder="Search by name & id"
-               id="searchInput"
-            />
-            <button onclick="searchProduct(), searchProductByname()">Search</button>
-         </div>
-           <strong id="totalProducts">  </strong> &nbsp; &nbsp; &nbsp; <strong id="availableStock"> </strong> <br><button onclick="location.reload()" style=" width:10%; margin-bottom: 10px; background-color: rgb(231, 207, 87); border-radius: 10px; color: black; font-weight: bolder; margin-top: 5px;">All</button>
-           <button id="bedroom" style="margin-bottom: 10px;  background-color: aqua; border-radius: 10px; color: black; font-weight: bolder; margin-top: 10px; width: 10%;">Badroom</button> <button id="kitchen" style="margin-bottom: 10px;  width: 10%; background-color: aqua; border-radius: 10px; color: black; font-weight: bolder; margin-top: 10px;">Kitchen</button> <button id="office" style="margin-bottom: 10px;  width: 10%; background-color: aqua; border-radius: 10px; color: black; font-weight: bolder; margin-top: 10px;">Office</button>
-            <table id="table">
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Category</th>
-                    <th>Image</th>
-                    <th>Company</th>
-                    <th>Inventory</th>
-                    <th>Actions</th>
-                </tr>
-                <tbody id="productTable">
-                  <tr>
-                     <td id="productId">1</td>
-                     <td id="productName">Product A</td>
-                     <td id="productPrice">$100</td>
-                     <td id="productCategory">Electronics</td>
-                     <td id="productImage"><img class="product" src="product-a.jpg" alt="Product A"></td>
-                     <td id="productCompany">Company X</td>
-                     <td id="productInventory">50</td>
-                     <td class="actions">
-                         <button class="btn btn-edit" id="EditBtn">Edit</button>
-                         <button class="btn btn-delete">Delete</button>
-                     </td>
-                 </tr>
-                </tbody>
-            </table>
+
+            <div class="stat-grid" style="margin-top: 22px">
+               <div class="stat">
+                  <p class="stat__label">Products</p>
+                  <p class="stat__value" id="totalProducts">—</p>
+               </div>
+               <div class="stat">
+                  <p class="stat__label">Total stock</p>
+                  <p class="stat__value" id="availableStock">—</p>
+               </div>
+            </div>
+
+            <div class="bar" style="margin-top: 24px">
+               <div class="chips" id="categoryChips" role="group" aria-label="Filter by category">
+                  <button class="chip" type="button" data-cat="" aria-pressed="true">
+                     All
+                  </button>
+                  <button class="chip" type="button" data-cat="office" aria-pressed="false">
+                     Office
+                  </button>
+                  <button class="chip" type="button" data-cat="kitchen" aria-pressed="false">
+                     Kitchen
+                  </button>
+                  <button class="chip" type="button" data-cat="bedroom" aria-pressed="false">
+                     Bedroom
+                  </button>
+               </div>
+               <div class="bar__right">
+                  <div class="search" style="max-width: 280px">
+                     <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        aria-hidden="true"
+                     >
+                        <circle cx="11" cy="11" r="6.5" />
+                        <path d="m16 16 4.5 4.5" />
+                     </svg>
+                     <input
+                        id="searchInput"
+                        type="search"
+                        placeholder="Search products"
+                        aria-label="Search products"
+                     />
+                  </div>
+                  <a class="btn btn--sm" href="./add-products.html">Add product</a>
+               </div>
+            </div>
+
+            <div class="table-wrap">
+               <table class="table">
+                  <thead>
+                     <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Company</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                     </tr>
+                  </thead>
+                  <tbody id="productTable">
+                     <tr>
+                        <td class="table__empty" colspan="6">Loading products…</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </main>
       </div>
-      <script src="./static/js/product/category.js"></script>
+
+      <script src="./static/js/coman/nav.js"></script>
+      <script src="./static/js/coman/toast.js"></script>
+      <script src="./static/js/coman/currentUser.js"></script>
+      <script src="./static/js/coman/adminShell.js"></script>
       <script src="./static/js/product/productList.js"></script>
       <script src="./static/js/product/deleteProduct.js"></script>
-      <script src="./static/js/product/searchProduct.js"></script>
-      <script src="./static/js/coman/currentUser.js"></script>
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
    </body>
 </html>

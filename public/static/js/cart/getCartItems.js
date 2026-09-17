@@ -1,99 +1,124 @@
 async function fetchCartItems() {
+   const list = document.getElementById("cart-items");
+   const summary = document.getElementById("cart-summary");
+   if (!list || !summary) return;
+
    try {
-      const response = await fetch("http://127.0.0.1:5000/api/cart", {
+      const response = await fetch("/api/cart", {
          method: "GET",
          credentials: "include",
       });
 
-      if (!response.ok) {
-         throw new Error("Failed to fetch cart items");
-      }
+      if (!response.ok) throw new Error("Failed to fetch cart items");
 
       const cartItems = await response.json();
-
-      if (!cartItems || cartItems.length === 0) {
-         document.querySelector(".cart-container").innerHTML =
-            "<p>Your cart is empty.</p>";
-         return;
-      }
-
-      const productDetailsContainer =
-         document.querySelector(".product-details");
-      productDetailsContainer.innerHTML = "<h2>Product Details</h2>";
-
-      let totalOriginalPrice = 0;
-      let totalDiscountedPrice = 0;
-
-      cartItems.forEach((item) => {
-         totalOriginalPrice += item.price * item.quantity;
-         totalDiscountedPrice += item.price * item.quantity;
-
-         const productCard = `
-             <div class="product-card">
-                <img src="http://127.0.0.1:5000/${item.image}" alt="${item.name}" />
-                <div class="product-info">
-                   <span class="mall-tag">Mall</span>
-                   <h3>${item.name}</h3>
-                   <p class="price">
-                      ₹${item.price} <span class="original-price">₹${item.price}</span>
-                   </p>
-                   <p>All issue easy returns</p>
-                   <p>Category: ${item.category} • Qty: ${item.quantity}</p>
-                   <a href="#" class="remove" data-id="${item._id}">✖ REMOVE</a>
-                </div>
-             </div>
-             <p class="sold-by">
-                Sold by: Vendor <span class="free-delivery">Free Delivery</span>
-             </p>`;
-
-         productDetailsContainer.innerHTML += productCard;
-      });
-
-      document.querySelector(".price-details").innerHTML = `
-          <h2>Price Details (${cartItems.length} Items)</h2>
-          <p>Total Product Price <span class="price">+ ₹${totalOriginalPrice}</span></p>
-          <hr />
-          <p class="order-total">
-             Order Total <span class="total">₹${totalDiscountedPrice}</span>
-          </p>
-          <button class="continue-btn">Continue</button>
-          <div class="safety-info">
-             <p>🛡 Your Safety, Our Priority</p>
-             <p>We make sure that your package is safe at every point of contact.</p>
-          </div>`;
-
-      document.querySelectorAll(".remove").forEach((button) => {
-         button.addEventListener("click", async (e) => {
-            e.preventDefault();
-            const productId = e.target.dataset.id;
-            await removeCartItem(productId);
-            fetchCartItems();
-         });
-      });
+      renderCart(Array.isArray(cartItems) ? cartItems : []);
    } catch (error) {
-      console.error("Error fetching cart items:", error);
+      list.innerHTML =
+         '<div class="card muted">Could not load your cart. Try refreshing.</div>';
+      summary.innerHTML = "";
    }
 }
 
+function renderCart(items) {
+   const list = document.getElementById("cart-items");
+   const summary = document.getElementById("cart-summary");
+
+   if (!items.length) {
+      list.innerHTML = `
+         <div class="empty" style="grid-column:auto">
+            <h3>Your cart is empty</h3>
+            <p>Add a few pieces and they will show up here.</p>
+            <a class="btn" href="./index2.html">Browse products</a>
+         </div>`;
+      summary.innerHTML = "";
+      return;
+   }
+
+   const total = items.reduce(
+      (sum, item) => sum + Number(item.price) * Number(item.quantity),
+      0
+   );
+   const units = items.reduce((sum, item) => sum + Number(item.quantity), 0);
+   const delivery = total >= 250 ? 0 : 15;
+
+   list.innerHTML = items
+      .map(
+         (item) => `
+      <article class="cart-item">
+         <img class="cart-item__shot" src="${item.image}" alt="${item.name}">
+         <div class="cart-item__body">
+            <h2 class="cart-item__name">${item.name}</h2>
+            <p class="cart-item__meta">${item.category} · Qty ${
+            item.quantity
+         }</p>
+            <p class="cart-item__meta">Free 30 day returns</p>
+            <div class="cart-item__foot">
+               <span class="price">$${(
+                  Number(item.price) * Number(item.quantity)
+               ).toFixed(2)}</span>
+               <button class="cart-item__remove" type="button" data-remove="${
+                  item._id
+               }">Remove</button>
+            </div>
+         </div>
+      </article>`
+      )
+      .join("");
+
+   summary.innerHTML = `
+      <div class="card__head">
+         <div>
+            <h2 class="card__title">Order summary</h2>
+            <p class="card__sub">${units} item${units === 1 ? "" : "s"}</p>
+         </div>
+      </div>
+      <div class="rows">
+         <div class="row">
+            <span class="row__key">Subtotal</span>
+            <span class="row__val">$${total.toFixed(2)}</span>
+         </div>
+         <div class="row">
+            <span class="row__key">Delivery</span>
+            <span class="row__val">${
+               delivery ? "$" + delivery.toFixed(2) : "Free"
+            }</span>
+         </div>
+         <div class="row">
+            <span class="row__key">Total</span>
+            <span class="row__val price">$${(total + delivery).toFixed(2)}</span>
+         </div>
+      </div>
+      <button class="btn btn--block continue-btn" type="button" style="margin-top:18px">
+         Checkout
+      </button>
+      <p class="muted" style="font-size:12.5px;margin:14px 0 0">
+         Your package is protected at every point of contact.
+      </p>`;
+}
+
+document.addEventListener("click", async (event) => {
+   const remove = event.target.closest("[data-remove]");
+   if (!remove) return;
+
+   await removeCartItem(remove.dataset.remove);
+});
+
 async function removeCartItem(productId) {
    try {
-      const response = await fetch(
-         `http://127.0.0.1:5000/api/cart/${productId}`,
-         {
-            method: "DELETE",
-            credentials: "include",
-         }
-      );
+      const response = await fetch(`/api/cart/${productId}`, {
+         method: "DELETE",
+         credentials: "include",
+      });
 
-      location.reload();
+      if (!response.ok) throw new Error("Failed to remove item from cart");
 
-      if (!response.ok) {
-         throw new Error("Failed to remove item from cart");
-      }
+      toast("Removed from your cart");
+      fetchCartItems();
+      if (window.updateCartCount) window.updateCartCount();
    } catch (error) {
-      console.error("Error removing cart item:", error);
+      toastError("Could not remove that item");
    }
 }
 
 fetchCartItems();
-

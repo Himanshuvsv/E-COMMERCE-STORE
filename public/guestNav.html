@@ -1,85 +1,92 @@
-<header id="header" class="header d-flex align-items-center fixed-top">
-   <div
-      class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between"
-   >
-      <a
-         href="index.html"
-         class="logo d-flex align-items-center me-auto me-xl-0"
+<header class="top">
+   <div class="wrap top__row">
+      <button
+         class="burger burger--drawer"
+         type="button"
+         data-panel="#drawer"
+         aria-label="Open menu"
       >
-         <img src="./logo.jpeg" alt="" />
-         <h1 class="sitename">SHOPEASE</h1>
+         <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+            aria-hidden="true"
+         >
+            <path d="M4 7h16M4 12h16M4 17h16" />
+         </svg>
+      </button>
+
+      <a class="brand" href="./index.html">
+         <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+         >
+            <path
+               d="M4 8h16l-1.3 11.2a1.5 1.5 0 0 1-1.5 1.3H6.8a1.5 1.5 0 0 1-1.5-1.3z"
+            />
+            <path d="M8.6 8V6.3a3.4 3.4 0 0 1 6.8 0V8" />
+         </svg>
+         <span class="brand__name">ShopEase</span>
       </a>
 
-      <nav id="navmenu" class="navmenu">
-         <ul>
-            <li><a href="./index.html" class="active">Home</a></li>
-            <li><a href="./guestabout.html">About</a></li>
-            <li class="dropdown">
-               <a href="#"
-                  ><span>Categories</span>
-                  <i class="bi bi-chevron-down toggle-dropdown"></i>
-               </a>
-               <ul>
-                  <li>
-                     <a
-                        href="#"
-                        class="category-link"
-                        data-category=""
-                        onclick="fetchProducts()"
-                        >All</a
-                     >
-                  </li>
-                  <li>
-                     <a
-                        href="#"
-                        class="category-link"
-                        data-category="office"
-                        onclick="fetchProductsByCategory('office')"
-                        >Office</a
-                     >
-                  </li>
-                  <li>
-                     <a
-                        href="#"
-                        class="category-link"
-                        data-category="kitchen"
-                        onclick="fetchProductsByCategory('kitchen')"
-                        >Kitchen</a
-                     >
-                  </li>
-                  <li>
-                     <a
-                        href="#"
-                        class="category-link"
-                        data-category="bedroom"
-                        onclick="fetchProductsByCategory('bedroom')"
-                        >Bedroom</a
-                     >
-                  </li>
-               </ul>
-            </li>
-            <li><a href="./guestcontact.html">Contact</a></li>
-            <li>
-               <input
-                  class="search"
-                  type="text"
-                  id="searchInput"
-                  placeholder="Search for products"
-               />
-               <button onclick="searchProduct()">Search</button>
-            </li>
-            <li class="dropdown">
-               <a href="#" id="user-dropdown">
-                  <span id="username">Guest</span>
-                  <i class="bi bi-chevron-down toggle-dropdown"></i>
-               </a>
-               <ul>
-                  <li><a href="./register.html">Register</a></li>
-                  <li><a href="./login.html" id="logoutbtn">Login</a></li>
-               </ul>
-            </li>
-         </ul>
-         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      <nav class="nav" aria-label="Main">
+         <a href="./index.html">Home</a>
+         <a href="./guestabout.html">About</a>
+         <a href="./guestcontact.html">Contact</a>
       </nav>
+
+      <div class="search">
+         <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+         >
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="m16 16 4.5 4.5" />
+         </svg>
+         <input
+            id="searchInput"
+            type="search"
+            placeholder="Search products"
+            aria-label="Search products"
+         />
+      </div>
+
+      <a class="who" href="./login.html">Sign in</a>
+      <a class="btn btn--sm" href="./register.html">Register</a>
    </div>
 </header>
+
+<aside class="drawer" id="drawer" aria-label="Menu">
+   <div class="drawer__head">
+      <span class="brand__name">ShopEase</span>
+      <button
+         class="drawer__close"
+         type="button"
+         data-panel-close
+         aria-label="Close menu"
+      >
+         &times;
+      </button>
+   </div>
+   <ul>
+      <li><a href="./index.html">Home</a></li>
+      <li><a href="./guestabout.html">About</a></li>
+      <li><a href="./guestcontact.html">Contact</a></li>
+   </ul>
+   <p class="drawer__label">Account</p>
+   <ul>
+      <li><a href="./login.html">Sign in</a></li>
+      <li><a href="./register.html">Create account</a></li>
+   </ul>
+</aside>

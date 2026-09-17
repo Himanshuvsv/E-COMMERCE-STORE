@@ -1,84 +1,80 @@
 async function fetchWishlist() {
+   const container = document.getElementById("wishlist-grid");
+   if (!container) return;
+
    try {
-      const response = await fetch(
-         "http://127.0.0.1:5000/api/wishlist/showMyWishlist",
-         {
-            method: "GET",
-            credentials: "include",
-         }
-      );
+      const response = await fetch("/api/wishlist/showMyWishlist", {
+         method: "GET",
+         credentials: "include",
+      });
 
       if (!response.ok) throw new Error("Failed to fetch wishlist items");
-      const data = await response.json();
 
-      displayWishlist(data.wishlistData);
+      const data = await response.json();
+      displayWishlist(data.wishlistData || []);
    } catch (error) {
-      console.error("Error fetching wishlist:", error);
-      document.querySelector(".product-grid").innerHTML =
-         "<p class='wishlist-error'>Failed to load wishlist items.</p>";
+      container.innerHTML = emptyStateMarkup(
+         "Could not load your wishlist",
+         "Something went wrong. Try refreshing the page."
+      );
+      setResultCount(0);
    }
 }
 
 function displayWishlist(wishlist) {
-   const container = document.querySelector(".product-grid");
-   container.innerHTML = "";
+   const container = document.getElementById("wishlist-grid");
+   setResultCount(wishlist.length);
 
-   if (wishlist.length === 0) {
-      container.innerHTML =
-         "<p class='wishlist-message'>Your wishlist is empty.</p>";
+   if (!wishlist.length) {
+      container.innerHTML = emptyStateMarkup(
+         "Your wishlist is empty",
+         "Save the pieces you like and they will show up here.",
+         "Browse products",
+         "./index2.html"
+      );
       return;
    }
 
-   wishlist.forEach((item) => {
-      const product = item.product;
-      const productCard = document.createElement("div");
-      productCard.classList.add("product-card");
-
-      // Ensure correct image path
-      const imageUrl = product.image.startsWith("/")
-         ? `http://127.0.0.1:5000${product.image}`
-         : product.image;
-
-      productCard.innerHTML = `
-            <div class="wishlist-header">
-                <i class="fa-solid fa-heart wishlist-icon" data-product-id="${product._id}"></i>
-                <span class="remove-icon" data-id="${item._id}">❌</span>
-            </div>
-            <img src="${imageUrl}" alt="${product.name}" class="product-img" />
-            <p>${product.name}</p>
-            <p><strong>&#8377;${product.price}</strong></p>
-            <span class="rating">${product.averageRating} ★</span>
-        `;
-
-      container.appendChild(productCard);
-   });
-
-   // Attach event listeners to remove icons
-   document.querySelectorAll(".remove-icon").forEach((icon) => {
-      icon.addEventListener("click", async (event) => {
-         const wishlistItemId = event.target.getAttribute("data-id");
-         await removeFromWishlist(wishlistItemId);
-      });
-   });
+   container.innerHTML = wishlist
+      .map((item) =>
+         productCardMarkup(item.product, {
+            wishlist: true,
+            inWishlist: true,
+            removeLabel: "Remove",
+            wishlistItemId: item._id,
+         })
+      )
+      .join("");
 }
+
+document.addEventListener("click", async (event) => {
+   const remove = event.target.closest(".remove-wishlist");
+   if (remove) {
+      await removeFromWishlist(remove.dataset.wishlistId);
+      return;
+   }
+
+   const fav = event.target.closest(".fav");
+   if (fav) {
+      const card = fav.closest(".pcard");
+      const button = card ? card.querySelector(".remove-wishlist") : null;
+      if (button) await removeFromWishlist(button.dataset.wishlistId);
+   }
+});
 
 async function removeFromWishlist(wishlistItemId) {
    try {
-      const response = await fetch(
-         `http://127.0.0.1:5000/api/wishlist/${wishlistItemId}`,
-         {
-            method: "DELETE",
-            credentials: "include",
-         }
-      );
+      const response = await fetch(`/api/wishlist/${wishlistItemId}`, {
+         method: "DELETE",
+         credentials: "include",
+      });
 
-      if (!response.ok) {
-         alert("failed to remove");
-         throw new Error("Failed to remove item from wishlist");
-      }
+      if (!response.ok) throw new Error("Failed to remove item");
+
+      toast("Removed from your wishlist");
       fetchWishlist();
    } catch (error) {
-      console.error("Error removing item:", error);
+      toastError("Could not remove that item");
    }
 }
 
