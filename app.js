@@ -25,8 +25,7 @@ const errorHandlerMiddleware = require("./middleware/error-handler");
 const corsOrigins = [
    "http://127.0.0.1:5050",
    "http://localhost:5050",
-   "http://127.0.0.1:5000",
-   "http://localhost:5000",
+   "https://pintu.zapto.org"
 ];
 
 app.set("trust proxy", 1);
